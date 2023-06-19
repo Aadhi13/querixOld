@@ -76,13 +76,10 @@ function Signup() {
       const email = data.email;
       const name = data.name;
       const expiresAt = response.data.expiresAt;
-      console.log(response.data.message)
       setLoader(false);
       navigate('/otp-verify', { state: { email, name, expiresAt } });
     } catch (err) {
       setLoader(false);
-      console.log(err.code)
-      console.log(err.message)
       if (!err?.response) {
         setErrMsg('No server response.');
       } else if (err.code==="ERR_NETWORK") {
@@ -104,7 +101,7 @@ function Signup() {
 
   return (
     <>
-      <div className='items-center justify-center flex' style={{ height: '100vh' }}>
+      <div className='items-center justify-center flex' style={{ height: '91vh' }}>
         <div className="">
           <div className="rounded-lg shadow-lg shadow-gray-300 bg-gray-100 w-90 h-auto">
             <div style={{ width: "362px" }} className="px-10 sm:p-6">
@@ -319,10 +316,10 @@ function Signup() {
           </div>
           <div className="place-content-center">
             <p className="items-center justify-center flex mt-8">
-              New to Querix?&nbsp;
+              Already have an account?&nbsp;
               <Link to="/signin">
                 <span className="text-linkedin font-semibold hover:bg-linkedin2 hover:bg-opacity-20 hover:rounded-full hover:underline px-2 py-1 cursor-pointer">
-                  Join now
+                  Sign in
                 </span>
               </Link>
             </p>

@@ -5,6 +5,9 @@ import Layout from "../pages/user/Layout";
 import OtpVerify from "../pages/user/OtpVerifyPage";
 import Signin from "../pages/user/SigninPage";
 import Home from "../pages/user/HomePage";
+import Question from "../pages/user/QuestoinPage";
+import ForgotPassword from "../pages/user/FogotPasswordPage";
+
 
 import '../assets/styles/user.css';
 
@@ -18,6 +21,8 @@ function UserRoutes() {
         <Route path="signup" element={<Signup />} />
         <Route path="otp-verify" element={<OtpVerify />} />
         <Route path="signin" element={<Signin />} />
+        <Route path="question/:id" element={<Question />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
       </Route >
     </Routes>
   )

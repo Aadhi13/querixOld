@@ -32,19 +32,14 @@ const userSignup = async (req, res) => {
                 const { expiresAt } = await userOtpData.findOne({ email }) || {};
                 return res.status(200).json({ message: 'Request is received', expiresAt });
             } catch (err) {
-                console.log(err.message);
                 return res.status(500).json({ message: 'Something went wrong.' });
             }
         }
     } catch (err) {
-        console.log(err.message);
         return res.status(500).json({ message: 'Internal server error.' })
     }
 };
 
-const signupGet = async (req, res) => {
-    res.send('hello world')
-}
 
 const otpVerify = async (req, res) => {
     try {
@@ -68,7 +63,6 @@ const otpVerify = async (req, res) => {
             }
         }
     } catch (err) {
-        console.log(err.message);
         return res.status(500).json({ message: 'Internal server error.' });
     }
 }
@@ -84,7 +78,6 @@ const otpResend = async (req, res) => {
             const { expiresAt } = await userOtpData.findOne({ email }) || {};
             return res.status(200).json({ message: 'Request is received', expiresAt });
         } catch (err) {
-            console.log(err.message);
             return res.status(500).json({ message: 'Something went wrong.' });
         }
     } catch (err) {
@@ -106,7 +99,6 @@ const userSignin = async (req, res) => {
                     const { expiresAt } = await userOtpData.findOne({ email }) || {};
                     return res.status(200).json({ message: 'User is not verified, OTP sended to mail.', expiresAt });
                 } catch (err) {
-                    console.log(err.message);
                     return res.status(500).json({ message: 'Something went wrong.' });
                 }
             }
@@ -127,7 +119,6 @@ const userSignin = async (req, res) => {
 
 module.exports = {
     userSignup,
-    signupGet,
     otpVerify,
     otpResend,
     userSignin

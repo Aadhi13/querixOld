@@ -68,21 +68,16 @@ function Signin() {
             const email = data.email;
             const name = data.name;
             setLoader(false);
-            console.log(response.data.accessToken, 'accessToken');
-            console.log(response.data.message);
-            console.log(response.status);
             if (response.data.message === 'User is not verified, OTP sended to mail.') {
                 setErrMsg('This email is not verified, OTP sended to mail.');
                 const expiresAt = response.data.expiresAt;
                 navigate('/otp-verify', { state: { email, name, expiresAt } });
-            } else if (response.data.message === 'Access Token is created.' ) {
+            } else if (response.data.message === 'Access Token is created.') {
                 localStorage.setItem('user', response.data.accessToken);
                 navigate('/');
             }
         } catch (err) {
             setLoader(false);
-            console.log(err.code);
-            console.log(err.message);
             if (!err?.response) {
                 setErrMsg('No server response.');
             } else if (err.code === "ERR_NETWORK") {
@@ -103,7 +98,7 @@ function Signin() {
     }
     return (
         <>
-            <div className='items-center justify-center flex' style={{ height: '100vh' }}>
+            <div className='items-center justify-center flex' style={{ height: '91vh' }}>
                 <div className="">
                     <div className="rounded-lg shadow-lg shadow-gray-300 bg-gray-100 w-90 h-auto">
                         <div style={{ width: "362px" }} className="px-10 sm:p-6">
@@ -191,8 +186,12 @@ function Signin() {
                                             The password you provided must have at least 8 characters.
                                         </p>
                                     </div>
-                                    <div className="text-linkedin font-semibold">
-                                        Forgot passowrd?
+                                    <div >
+                                        <Link to={'/forgot-password'}>
+                                            <span className="text-linkedin font-semibold hover:bg-sky-700 hover:bg-opacity-25 rounded-full hover:underline cursor-pointer px-2 py-1">
+                                                Forgot passowrd?
+                                            </span>
+                                        </Link>
                                     </div>
                                     <button
                                         className="w-full select-none p-4 bg-linkedin rounded-full text-white text-base font-roboto mt-3 font-semibold hover:bg-linkedin2 disabled:hover:bg-linkedin disabled:opacity-60"

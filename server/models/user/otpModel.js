@@ -20,6 +20,8 @@ const otpSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+},
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("userOtp", otpSchema);
+module.exports = mongoose.model("userOtps", otpSchema);
