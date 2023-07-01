@@ -3,121 +3,19 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
 import Answer from '../Answers/Answer';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import axios from '../../../api/axios';
 import { useSelector } from 'react-redux';
 
-
-// //need to fetch this answers from database
-// const answers = [
-//     {
-//         id: 'answer1',
-//         author: {
-//             id: 'user1',
-//             name: 'Adhil Ameen',
-//             userName: 'adhil6'
-//         },
-//         body: 'The answer is 6.020294',
-//         comments: [
-//             {
-//                 id: 'comment1',
-//                 author: {
-//                     id: 'user10',
-//                     name: 'Abdul Vahid',
-//                     userName: 'avkp333'
-//                 },
-//                 body: 'How?',
-//                 comments: [
-//                     {
-//                         id: 'comment31',
-//                         author: {
-//                             id: 'user1',
-//                             name: 'Adhil Ameen',
-//                             userName: 'adhil6'
-//                         },
-//                         body: 'Because, 1/0==true',
-//                         comments: [
-//                             {
-//                                 id: 'comment34331',
-//                                 author: {
-//                                     id: 'user1',
-//                                     name: 'Adhil Ameen',
-//                                     userName: 'adhil6'
-//                                 },
-//                                 body: 'I am vahid',
-//                             }
-//                         ]
-//                     }]
-//             },
-//             {
-//                 id: 'comment2',
-//                 author: {
-//                     id: 'user15',
-//                     name: 'Arun Ayyankav',
-//                     userName: 'arun81'
-//                 },
-//                 body: 'Nice answer, Thank you for answering',
-//                 comments: [
-//                     {
-//                         id: 'comment90',
-//                         author: {
-//                             id: 'user344',
-//                             name: 'Anurag MK',
-//                             userName: 'anu555'
-//                         },
-//                         body: 'This answer is not correct according to new MD%5 algorithem'
-//                     }]
-//             },]
-//     },
-//     {
-//         id: 'answer2',
-//         author: {
-//             id: 'user123',
-//             name: 'Arun Ayyankave',
-//             userName: 'Arunodayam'
-//         },
-//         body: 'The answer is not defined',
-//         comments: [
-//             {
-//                 id: 'comment555',
-//                 author: {
-//                     id: 'user10',
-//                     name: 'Abdul Vahid',
-//                     userName: 'avkp333'
-//                 },
-//                 body: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Non, porro tempora id quae cumque vero praesentium modi odit 
-//                 numquam libero maxime, reiciendis veniam repellat? Expedita ipsa ullam ad voluptatem reprehenderit.`,
-//             }
-//         ]
-//     },
-//     {
-//         id: 'answer234',
-//         author: {
-//             id: 'user2323',
-//             name: 'Bruce Wayne',
-//             userName: 'bat6man'
-//         },
-//         body: 'Heloo world I am new here how can i comment to a question.',
-//         comments: [
-//             {
-//                 id: 'comment34555',
-//                 author: {
-//                     id: 'user10',
-//                     name: 'Abdul Vahid',
-//                     userName: 'avkp333'
-//                 },
-//                 body: '1234132432?',
-//             }
-//         ]
-//     }
-// ]
 
 const INPUT_REGEX = /[^\s\n]/;
 
 function Question() {
 
+    const location = useLocation()
     const { id } = useParams()
     const [answersData, setAnswersData] = useState([]);
+    const [highliteAnswer, setHighliteAnswer] = useState('');
     const [question, setQuestion] = useState({});
 
     const [vote, setVote] = useState(0);
@@ -140,6 +38,7 @@ function Question() {
 
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(false);
+    const [lastQuestion, setLastQuestion] = useState(false);
     const [pageNumber, setPageNumber] = useState(0)
     const observer = useRef()
 
@@ -188,10 +87,34 @@ function Question() {
             const updatedAnswersData = [...answersData, ...response.data.answersData];
             setAnswersData(updatedAnswersData);
             setHasMore(response.data.answersCount > updatedAnswersData.length);
+            setLastQuestion(response.data.answersCount == updatedAnswersData.length);
             setLoading(false);
         };
-        fetchData();
+        fetchData()
     }, [pageNumber])
+
+
+    //Below useEffect will handle the answer url. By finding the answer among the answersData. 
+    //And pass it into answer component for highliting the answer and scroll down to its place.
+
+    useEffect(() => {
+        const answerId = location.hash.replace("#", ""); //Retrive answerId from url
+        if (lastQuestion) {
+            if (answersData.some(answer => answer._id === answerId)) {
+                setHighliteAnswer(answerId);
+            }
+        }
+        if (highliteAnswer || !answerId || !answersData || !hasMore) {
+            return;
+        }
+        if (answersData.some(answer => answer._id === answerId)) {
+            setHighliteAnswer(answerId);
+        } else {
+            setPageNumber(prevPageNumber => prevPageNumber + 1);
+        }
+    }, [location.hash, hasMore, answersData, lastQuestion]);
+
+
 
 
     //Tostify
@@ -569,8 +492,9 @@ function Question() {
                         {/* Here we are going to map the Answer component so there would be N number of answers with their own states. */}
                         {answersData && answersData.map((answer, index) => (
                             (Math.floor(answersData.length * 0.75) === index + 1) ?
-                                <Answer ref={lastAnswerRef} key={answer._id} answer={answer} index={index} /> :
-                                <Answer key={answer._id} answer={answer} index={index} />
+                                // (index === answersData.length - 3) ?
+                                <Answer ref={lastAnswerRef} key={answer._id} answer={answer} index={index} highliteAnswer={highliteAnswer} /> :
+                                <Answer key={answer._id} answer={answer} index={index} highliteAnswer={highliteAnswer} />
                         ))}
 
                     </div>
