@@ -52,6 +52,7 @@ function Header() {
             {userData ?
               <>
                 <div className='h-6 p-3 py-5 mt-1 flex items-center hover:bg-gray-200 font-roboto font-semibold'>{userData.name}</div>
+                <div className='h-6 p-3 py-5 flex items-center hover:bg-gray-200 font-roboto '>Account</div>
                 <div className='h-6 p-3 py-5 flex items-center hover:bg-gray-200 font-roboto ' onClick={() => { dispatch(logout()) }}>Logout</div>
               </>
               :

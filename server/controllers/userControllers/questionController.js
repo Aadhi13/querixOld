@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const userData = require("../../models/user/userModel");
 const questionData = require("../../models/user/questionModel");
+const answerData = require("../../models/user/answerModel");
 const ObjectId = mongoose.Types.ObjectId
 
 const addQuestion = async (req, res) => {
@@ -14,12 +15,11 @@ const addQuestion = async (req, res) => {
             //Change below HTTP status code to proper one (Missing information/request. Invalid request. Request is not complete. Data is missing in request)
             return res.status(400).json({ message: 'Queston is not complete.' });
         }
-        const question = await questionData.create({
+        await questionData.create({
             userId: data._id,
             question: input,
             tags
         })
-        const questionSave = await question.save()
         return res.status(200).json({ message: 'Question submitted.' });
     } catch (err) {
         console.log(err.message);
@@ -138,10 +138,37 @@ const questionSave = async (req, res) => {
     }
 }
 
+const questionAnswer = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { input, questionId } = req.body;
+        const userDetails = await userData.findById(userId);
+        const questionDetails = await questionData.findById(questionId);
+        if (!userDetails) {
+            return res.status(401).json({ message: 'No user found.' });
+        } else if (!input) {
+            //Change below HTTP status code to proper one (Missing information/request. Invalid request. Request is not complete. Data is missing in request)
+            return res.status(400).json({ message: 'Answer is not complete.' });
+        } else if (!questionData) {
+            return res.status(401).json({ message: 'Invalid question.' });
+        }
+        const answer = await answerData.create({
+            userId,
+            answer: input,
+            question: questionId
+        });
+        await questionDetails.updateOne({ $push: { answers: answer._id } });
+        return res.status(200).json({ message: 'Answer submitted.' });
+    } catch (err) {
+
+    }
+}
+
 module.exports = {
     addQuestion,
     questionsDataGet,
     questionDataGet,
     questionVote,
-    questionSave
+    questionSave,
+    questionAnswer
 };

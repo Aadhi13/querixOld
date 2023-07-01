@@ -1,6 +1,6 @@
 import { Info, Check, Cross } from "../../../assets/icons/Icons";
 import Google from "../../../assets/logos/google.png";
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from "../../../api/axios";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -30,6 +30,58 @@ function Signin() {
     })
 
 
+
+    //Google sign in 
+    useEffect(() => {
+        // global google
+        google.accounts.id.initialize({
+            client_id: import.meta.env.VITE_OAUTH_WEB_CLIENT_ID,
+            callback: handleGoogleSignInCallback,
+        });
+
+        google.accounts.id.renderButton(
+            document.getElementById("googleSigninDiv"),
+            {
+                theme: "outline",
+                type: "standard",
+                size: "large",
+                text: "continue_with",
+                shape: "circle",
+                width: "320px",
+                height: "30px",
+            }
+        )
+
+    }, [])
+
+    async function handleGoogleSignInCallback(response) {
+        console.log('Encoded JWT ID token: ', response.credential)
+        try {
+            const res = await axios.post('/signin-google', {}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: response.credential,
+                },
+                withCredentials: true,
+            });
+            if (res.data.message === 'Access Token is created.') {
+                localStorage.setItem('user', res.data.accessToken);
+                navigate('/');
+            }
+        } catch (err) {
+            if (!err?.res) {
+                setErrMsg('No server response.');
+            } else if (err.message == 'No jwt token.') {
+                setErrMsg('Something went wrong.');
+            } else if (err.message == 'Something went wrong.') {
+                setErrMsg('Something went wrong.');
+            } else {
+                setErrMsg('Signin Failed.');
+            }
+            errRef.current.focus();
+        }
+    }
+    
 
     const handleChange = ({ currentTarget: input }) => {
         setErrMsg('');
@@ -213,15 +265,18 @@ function Signin() {
                                 <p className="mx-3 text-sm text-gray-600">or</p>
                                 <hr className="w-1/2" />
                             </div>
-                            <div>
-                                <button className="flex justify-center items-center border-2 select-none bg-white border-slate-300 text-slate-800 hover:bg-[#edf3f2]  rounded-full w-full text-md font-roboto font-medium p-2">
+                            <div id="googleSigninDiv" className="flex justify-center">
+                                {/* <button
+                                    className="flex justify-center items-center border-2 select-none bg-white border-slate-300 text-slate-800 hover:bg-sky-50  rounded-full w-full text-md font-roboto font-medium p-2"
+                                    onClick={()=>google.accounts.id.prompt()}
+                                >
                                     <img
                                         src={Google}
                                         className="h-5 select-none pointer-events-none m-2"
                                         alt="Image of Google icon."
                                     />
                                     Sign in with Google
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     </div>

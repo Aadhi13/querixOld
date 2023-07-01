@@ -10,11 +10,17 @@ import { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
 import QuestionHome from './QuestionHome';
 import spinnerBlack from '../../../assets/Images/spinner-black-trans.gif'
 
+const INPUT_REGEX = /[^\s\n]/;
+
 function Home() {
     const [input, setInput] = useState({
         title: '',
         body: ''
     });
+    const [validInput, setValidInput] = useState({
+        title: false,
+        body: false
+    })
     const [tag, setTag] = useState('');
     const [tags, setTags] = useState([]);
     const [rows, setRows] = useState(1);
@@ -97,7 +103,7 @@ function Home() {
     //Submiting Question 
 
     const questionSubmit = async (e) => {
-        if (!input.title || !input.body) {
+        if (!input.title || !input.body || !validInput.title || !validInput.body) {
             return;
         }
         e.preventDefault();
@@ -177,6 +183,8 @@ function Home() {
 
     const texAreaHandleInput = (e) => {
         setInput({ ...input, body: e.target.value });
+        const result = INPUT_REGEX.test(e.target.value);
+        setValidInput({ ...validInput, body: result });
         const textarea = textAreaRef.current;
         const calContentHeight = (lineHeight) => {
             let origHeight = textarea.style.height;
@@ -212,6 +220,8 @@ function Home() {
     const titleHandleInput = (e) => {
         e.preventDefault();
         setInput({ ...input, title: e.target.value });
+        const result = INPUT_REGEX.test(e.target.value);
+        setValidInput({ ...validInput, title: result });
     };
 
 
@@ -290,7 +300,7 @@ function Home() {
                             <div><Media className='cursor-pointer p-1.5 w-8 rounded-md h-8 ml-4 hover:bg-gray-300' /></div>
                             {/* <div onClick={questionSubmit} className='flex justify-center items-center bg-profileBtBg hover:bg-profileBt cursor-pointer rounded-2xl mr-6 py-1 px-4 font-medium text-lg'>{!loader?'Submit':'Submiting...'}</div> */}
                             <div className='flex justify-center items-center mr-6 py-1 px-4 font-medium text-lg'>
-                                <button onClick={questionSubmit} disabled={!input.title || !input.body} className='disabled:opacity-50 disabled:hover:bg-gray-400 bg-gray-400 hover:bg-profileBt rounded-2xl mr-6 py-1 px-4 font-medium text-lg'>
+                                <button onClick={questionSubmit} disabled={!input.title || !input.body || !validInput.title || !validInput.body} className='disabled:opacity-50 disabled:hover:bg-gray-400 bg-gray-400 hover:bg-profileBt rounded-2xl mr-6 py-1 px-4 font-medium text-lg'>
                                     {!loader ? 'Submit' : 'Submiting...'}
                                 </button>
                             </div>

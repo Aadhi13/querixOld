@@ -3,7 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
 import Answer from '../Answers/Answer';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from '../../../api/axios';
 import { useSelector } from 'react-redux';
 
@@ -112,6 +112,8 @@ const answers = [
     }
 ]
 
+const INPUT_REGEX = /[^\s\n]/;
+
 function Question() {
 
     const { id } = useParams()
@@ -121,7 +123,8 @@ function Question() {
     const initialVoteCount = question.votes && question.votes.upVote.count - question.votes.downVote.count;
     const [voteCount, setVoteCount] = useState(initialVoteCount);
     const [input, setInput] = useState('')
-    const [rows, setRows] = useState(4);
+    const [validInput, setValidInput] = useState(false);
+    const [rows, setRows] = useState(2);
     const [loader, setLoader] = useState(false);
     const textAreaRef = useRef(null);
     const userData = useSelector((state) => state.userData.userData);
@@ -155,11 +158,16 @@ function Question() {
     }, [id])
 
 
+
     //Tostify
 
     const showToastMessage = (type) => {
         if (type == 'noUser') {
             toast.error('Please login to vote question.', {
+                position: toast.POSITION.TOP_CENTER
+            });
+        } else if (type == 'noUserAnswer') {
+            toast.error('Please login to answer question.', {
                 position: toast.POSITION.TOP_CENTER
             });
         } else if (type == 'noUserSave') {
@@ -170,6 +178,10 @@ function Question() {
             toast.success('Link copied to clipboard.', {
                 position: toast.POSITION.TOP_CENTER,
                 autoClose: 2000
+            });
+        } else if (type == 'success') {
+            toast.success('Answer successfully submitted.', {
+                position: toast.POSITION.TOP_CENTER,
             });
         }
     };
@@ -245,6 +257,8 @@ function Question() {
 
     const texAreaHandleInput = (e) => {
         setInput(e.target.value);
+        const result = INPUT_REGEX.test(e.target.value);
+        setValidInput(result);
         const textarea = textAreaRef.current;
         const calContentHeight = (lineHeight) => {
             let origHeight = textarea.style.height;
@@ -270,8 +284,8 @@ function Question() {
         const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
         const scrollHeight = calContentHeight(lineHeight);
         const nLines = Math.floor(scrollHeight / lineHeight);
-        if (nLines < 4) {
-            setRows(4);
+        if (nLines < 2) {
+            setRows(2);
         } else {
             setRows(nLines);
         }
@@ -322,8 +336,73 @@ function Question() {
 
 
     //Handle answer submit
-    const handleAnswerSubmit = () => {
+    const handleAnswerSubmit = async (e) => {
+        if (!validInput) {
+            return;
+        }
+        e.preventDefault();
+        try {
+            setLoader(true);
+            const token = localStorage.getItem('user')
+            if (!token) {
+                console.log(`no token can't answer question.`);
+                setInput('');
+                showToastMessage('noUserAnswer')
+                setLoader(false);
+                return;
+                //Can't answer question. Please login again.
+            }
+            const response = await axios.post('/question-answer', { input, questionId: question._id }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: token
+                },
+                withCredentials: true
+            });
 
+            if (response.data.message == 'Answer submitted.') {
+                setInput('');
+                showToastMessage('success');
+            }
+            setLoader(false);
+        } catch (err) {
+            console.log(err);
+            if (err == 'no token') {
+                setInput('');
+                showToastMessage('noUserAnswer')
+                setLoader(false);
+                //Can't submit answer. Please login again.
+            } else if (err.response.data.message == 'No user found.') {
+                setInput('');
+                setTags([]);
+                showToastMessage('noUserAnswer')
+                setLoader(false);
+                //Can't submit answer. Please login again.
+            } else if (err.response.data.message == 'Answer is not complete.') {
+                showToastMessage('unfinished')
+                setLoader(false);
+                //Can't submit unfinished question. Type both the tilte and your question.
+            } else if (err.response.data.message === 'no token') {
+                setInput('');
+                showToastMessage('noUserAnswer')
+                setLoader(false);
+                //Can't submit asnwer. Please login again.
+            } else if (err.response.data.message == 'No jwt token.') {
+                setInput('');
+                showToastMessage('noUserAnswer')
+                setLoader(false);
+            } else if (err.response.data.message == 'Invalid jwt token.') {
+                localStorage.removeItem('user')
+                setInput('');
+                showToastMessage('noUserAnswer')
+                setLoader(false);
+            } else if (err.response.data.message == 'Jwt expired.') {
+                localStorage.removeItem('user')
+                setInput('');
+                showToastMessage('noUserAnswer')
+                setLoader(false);
+            }
+        }
     }
 
 
@@ -425,7 +504,7 @@ function Question() {
                                             <div className='flex items-center ml-1 text-sm '>@{userData?.userName}</div>
                                         </div>
                                     </div>
-                                    {/* The textarea aka Input boxes for asking questions */}
+                                    {/* The textarea aka Input box for answering questions */}
                                     <div>
                                         <form>
                                             <div className='flex justify-center items-center'>
@@ -437,17 +516,21 @@ function Question() {
                                     <div className='flex justify-center mr-6 ml-0.5 items-center border-b border-gray-400 mt-3'></div>
                                     <div className='flex justify-between items-center mt-3'>
                                         <div className='flex justify-center items-center mr-6 py-1 px-4 font-medium text-lg'>
-                                            <button onClick={handleAnswerSubmit} disabled={!input} className='disabled:opacity-50 disabled:hover:bg-gray-400 bg-gray-400 hover:bg-profileBt rounded-2xl mr-6 py-1 px-4 font-medium text-lg'>
+                                            <button onClick={handleAnswerSubmit} disabled={!validInput} className='disabled:opacity-50 disabled:hover:bg-gray-400 bg-gray-400 hover:bg-profileBt rounded-2xl mr-6 py-1 px-4 font-medium text-lg'>
                                                 {!loader ? 'Submit' : 'Submiting...'}
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div> :
-                            <div className='py-4 mb-3 text-lg font-semibold'>Login to answer question <span className='text-blue-500'>Sign In</span></div>
+                            </div>
+                            :
+                            // If the user is not signed in 
+                            <div className='py-4 mb-3 text-lg font-semibold'>Login to answer question <Link to='/signin' className='text-blue-500'>Sign In</Link></div>
                         }
+
+
                         {/* Here we are going to map the Answer component so there would be N number of answers with their own states. */}
-                        {answers && answers.map((answer, index) => (
+                        {answersData && answersData.map((answer, index) => (
                             <Answer key={answer.id} answer={answer} index={index} />
                         ))}
 

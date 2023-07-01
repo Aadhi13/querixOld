@@ -1,6 +1,6 @@
 import { Info, Check, Cross } from "../../../assets/icons/Icons";
 import Google from "../../../assets/logos/google.png";
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from "../../../api/axios";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -38,6 +38,58 @@ function Signup() {
     userName: false
   })
 
+
+  //Google sign in 
+  useEffect(() => {
+    // global google
+    google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_OAUTH_WEB_CLIENT_ID,
+      callback: handleGoogleSignInCallback,
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("googleSignupDiv"),
+      {
+        theme: "outline",
+        type: "standard",
+        size: "large",
+        text: "signup_with",
+        shape: "circle",
+        width: "320px",
+        height: "30px",
+      }
+    )
+
+  }, [])
+
+  async function handleGoogleSignInCallback(response) {
+    console.log('Encoded JWT ID token: ', response.credential)
+    try {
+      const res = await axios.post('/signin-google', {}, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: response.credential,
+        },
+        withCredentials: true,
+      });
+      if (res.data.message === 'Access Token is created.') {
+        localStorage.setItem('user', res.data.accessToken);
+        navigate('/');
+      }
+    } catch (err) {
+      if (!err?.res) {
+        setErrMsg('No server response.');
+      } else if (err.message == 'No jwt token.') {
+        setErrMsg('Something went wrong.');
+      } else if (err.message == 'Something went wrong.') {
+        setErrMsg('Something went wrong.');
+      } else {
+        setErrMsg('Signup Failed.');
+      }
+      errRef.current.focus();
+    }
+  }
+
   const handleChange = ({ currentTarget: input }) => {
     setData({ ...data, [input.name]: input.value });
     const regexName = input.name.toUpperCase() + '_REGEX';
@@ -46,7 +98,7 @@ function Signup() {
     setValidData({ ...validData, [input.name]: result });
 
     //check if userName is already exist
-    
+
   };
 
   const handleFocus = (event) => {
@@ -82,7 +134,7 @@ function Signup() {
       setLoader(false);
       if (!err?.response) {
         setErrMsg('No server response.');
-      } else if (err.code==="ERR_NETWORK") {
+      } else if (err.code === "ERR_NETWORK") {
         setErrMsg(err.message);
       } else if (err.response.data.message === 'User Exist') {
         setErrMsg("There is already have an account associated with your email. Try Sign in.");
@@ -293,7 +345,7 @@ function Signup() {
                     }
                     type="submit"
                   >
-                    {loader?'Loading...':'Sign up'}
+                    {loader ? 'Loading...' : 'Sign up'}
                   </button>
                 </div>
               </form>
@@ -302,15 +354,15 @@ function Signup() {
                 <p className="mx-3 text-sm text-gray-600">or</p>
                 <hr className="w-1/2" />
               </div>
-              <div>
-                <button className="flex justify-center items-center border-2 select-none bg-white border-slate-300 text-slate-800 hover:bg-[#edf3f2]  rounded-full w-full text-md font-roboto font-medium p-2">
+              <div id="googleSignupDiv" className="flex justify-center">
+                {/* <button className="flex justify-center items-center border-2 select-none bg-white border-slate-300 text-slate-800 hover:bg-[#edf3f2]  rounded-full w-full text-md font-roboto font-medium p-2">
                   <img
                     src={Google}
                     className="h-5 select-none pointer-events-none m-2"
                     alt="Image of Google icon."
                   />
                   Sign in with Google
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

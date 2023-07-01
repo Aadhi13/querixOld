@@ -3,6 +3,8 @@ const userData = require('../../models/user/userModel');
 const mongoose = require("mongoose");
 const userOtpData = require('../../models/user/otpModel');
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.OAUTH_WEB_CLIENT_ID);
 
 const {
     hashPassword,
@@ -117,9 +119,44 @@ const userSignin = async (req, res) => {
     }
 }
 
+
+const userSigninGoogle = async (req, res) => {
+    try {
+        const token = req.headers.authorization;
+        if (!token) return res.status(401).json({ message: 'No jwt token.' })
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.OAUTH_WEB_CLIENT_ID
+        });
+        const payload = ticket.getPayload();
+        const { email, name, sub } = payload;
+        const userExist = await userData.findOne({ email });
+        if (userExist) {
+            const userDetails = await userData.findOne({ email });
+            const accessToken = jwt.sign({ id: userDetails._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            return res.status(201).json({ message: 'Access Token is created.', accessToken });
+        } else {
+            const userName = name.replace(/\s/g, '').toLowerCase() + sub.toString().substr(6, 6);
+            const user = await userData.create({
+                userName,
+                name,
+                email,
+                verifyStatus: true
+            });
+            user.save()
+            const userDetails = await userData.findOne({ email });
+            const accessToken = jwt.sign({ id: userDetails._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            return res.status(201).json({ message: 'Access Token is created.', accessToken });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: 'Something went wrong.' });
+    }
+}
+
 module.exports = {
     userSignup,
     otpVerify,
     otpResend,
-    userSignin
+    userSignin,
+    userSigninGoogle
 };
