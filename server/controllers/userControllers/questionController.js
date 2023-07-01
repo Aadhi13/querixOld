@@ -118,14 +118,10 @@ const questionVote = async (req, res) => {
 }
 
 const questionSave = async (req, res) => {
-    console.log('here');
-    const userId = req.userId;
-    console.log(userId);
     try {
         const { questionId } = req.body
         const userId = req.userId;
         const userDetails = await userData.findById({ _id: userId });
-        console.log(userDetails);
         if (!userDetails) {
             return res.status(404).json({ message: 'User not found.' });
         } else {
@@ -138,31 +134,6 @@ const questionSave = async (req, res) => {
     }
 }
 
-const questionAnswer = async (req, res) => {
-    try {
-        const userId = req.userId;
-        const { input, questionId } = req.body;
-        const userDetails = await userData.findById(userId);
-        const questionDetails = await questionData.findById(questionId);
-        if (!userDetails) {
-            return res.status(401).json({ message: 'No user found.' });
-        } else if (!input) {
-            //Change below HTTP status code to proper one (Missing information/request. Invalid request. Request is not complete. Data is missing in request)
-            return res.status(400).json({ message: 'Answer is not complete.' });
-        } else if (!questionData) {
-            return res.status(401).json({ message: 'Invalid question.' });
-        }
-        const answer = await answerData.create({
-            userId,
-            answer: input,
-            question: questionId
-        });
-        await questionDetails.updateOne({ $push: { answers: answer._id } });
-        return res.status(200).json({ message: 'Answer submitted.' });
-    } catch (err) {
-
-    }
-}
 
 module.exports = {
     addQuestion,
@@ -170,5 +141,4 @@ module.exports = {
     questionDataGet,
     questionVote,
     questionSave,
-    questionAnswer
 };

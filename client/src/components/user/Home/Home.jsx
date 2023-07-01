@@ -38,7 +38,6 @@ function Home() {
         observer.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && hasMore) {
                 setPageNumber(prevPageNumber => prevPageNumber + 1)
-                console.log('visible')
             }
         })
         if (node) observer.current.observe(node)
@@ -69,7 +68,6 @@ function Home() {
         const fetchData = async () => {
             setLoading(true);
             const response = await axios.get("/questions-data", { params: { page: pageNumber } });
-            console.log(response.data.questionsData);
             const updatedQuestionsData = [...questionsData, ...response.data.questionsData];
             setQuestionsData(updatedQuestionsData);
             setHasMore(response.data.questionsCount > updatedQuestionsData.length);

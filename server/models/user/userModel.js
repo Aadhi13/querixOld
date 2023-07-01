@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'questions'
     }],
+    savedAnswers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'answers'
+    }],
     blockStatus: {
         type: Boolean,
         default: false

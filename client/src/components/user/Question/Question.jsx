@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
@@ -8,122 +8,125 @@ import axios from '../../../api/axios';
 import { useSelector } from 'react-redux';
 
 
-//need to fetch this answers from database
-const answers = [
-    {
-        id: 'answer1',
-        author: {
-            id: 'user1',
-            name: 'Adhil Ameen',
-            userName: 'adhil6'
-        },
-        body: 'The answer is 6.020294',
-        comments: [
-            {
-                id: 'comment1',
-                author: {
-                    id: 'user10',
-                    name: 'Abdul Vahid',
-                    userName: 'avkp333'
-                },
-                body: 'How?',
-                comments: [
-                    {
-                        id: 'comment31',
-                        author: {
-                            id: 'user1',
-                            name: 'Adhil Ameen',
-                            userName: 'adhil6'
-                        },
-                        body: 'Because, 1/0==true',
-                        comments: [
-                            {
-                                id: 'comment34331',
-                                author: {
-                                    id: 'user1',
-                                    name: 'Adhil Ameen',
-                                    userName: 'adhil6'
-                                },
-                                body: 'I am vahid',
-                            }
-                        ]
-                    }]
-            },
-            {
-                id: 'comment2',
-                author: {
-                    id: 'user15',
-                    name: 'Arun Ayyankav',
-                    userName: 'arun81'
-                },
-                body: 'Nice answer, Thank you for answering',
-                comments: [
-                    {
-                        id: 'comment90',
-                        author: {
-                            id: 'user344',
-                            name: 'Anurag MK',
-                            userName: 'anu555'
-                        },
-                        body: 'This answer is not correct according to new MD%5 algorithem'
-                    }]
-            },]
-    },
-    {
-        id: 'answer2',
-        author: {
-            id: 'user123',
-            name: 'Arun Ayyankave',
-            userName: 'Arunodayam'
-        },
-        body: 'The answer is not defined',
-        comments: [
-            {
-                id: 'comment555',
-                author: {
-                    id: 'user10',
-                    name: 'Abdul Vahid',
-                    userName: 'avkp333'
-                },
-                body: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Non, porro tempora id quae cumque vero praesentium modi odit 
-                numquam libero maxime, reiciendis veniam repellat? Expedita ipsa ullam ad voluptatem reprehenderit.`,
-            }
-        ]
-    },
-    {
-        id: 'answer234',
-        author: {
-            id: 'user2323',
-            name: 'Bruce Wayne',
-            userName: 'bat6man'
-        },
-        body: 'Heloo world I am new here how can i comment to a question.',
-        comments: [
-            {
-                id: 'comment34555',
-                author: {
-                    id: 'user10',
-                    name: 'Abdul Vahid',
-                    userName: 'avkp333'
-                },
-                body: '1234132432?',
-            }
-        ]
-    }
-]
+// //need to fetch this answers from database
+// const answers = [
+//     {
+//         id: 'answer1',
+//         author: {
+//             id: 'user1',
+//             name: 'Adhil Ameen',
+//             userName: 'adhil6'
+//         },
+//         body: 'The answer is 6.020294',
+//         comments: [
+//             {
+//                 id: 'comment1',
+//                 author: {
+//                     id: 'user10',
+//                     name: 'Abdul Vahid',
+//                     userName: 'avkp333'
+//                 },
+//                 body: 'How?',
+//                 comments: [
+//                     {
+//                         id: 'comment31',
+//                         author: {
+//                             id: 'user1',
+//                             name: 'Adhil Ameen',
+//                             userName: 'adhil6'
+//                         },
+//                         body: 'Because, 1/0==true',
+//                         comments: [
+//                             {
+//                                 id: 'comment34331',
+//                                 author: {
+//                                     id: 'user1',
+//                                     name: 'Adhil Ameen',
+//                                     userName: 'adhil6'
+//                                 },
+//                                 body: 'I am vahid',
+//                             }
+//                         ]
+//                     }]
+//             },
+//             {
+//                 id: 'comment2',
+//                 author: {
+//                     id: 'user15',
+//                     name: 'Arun Ayyankav',
+//                     userName: 'arun81'
+//                 },
+//                 body: 'Nice answer, Thank you for answering',
+//                 comments: [
+//                     {
+//                         id: 'comment90',
+//                         author: {
+//                             id: 'user344',
+//                             name: 'Anurag MK',
+//                             userName: 'anu555'
+//                         },
+//                         body: 'This answer is not correct according to new MD%5 algorithem'
+//                     }]
+//             },]
+//     },
+//     {
+//         id: 'answer2',
+//         author: {
+//             id: 'user123',
+//             name: 'Arun Ayyankave',
+//             userName: 'Arunodayam'
+//         },
+//         body: 'The answer is not defined',
+//         comments: [
+//             {
+//                 id: 'comment555',
+//                 author: {
+//                     id: 'user10',
+//                     name: 'Abdul Vahid',
+//                     userName: 'avkp333'
+//                 },
+//                 body: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Non, porro tempora id quae cumque vero praesentium modi odit 
+//                 numquam libero maxime, reiciendis veniam repellat? Expedita ipsa ullam ad voluptatem reprehenderit.`,
+//             }
+//         ]
+//     },
+//     {
+//         id: 'answer234',
+//         author: {
+//             id: 'user2323',
+//             name: 'Bruce Wayne',
+//             userName: 'bat6man'
+//         },
+//         body: 'Heloo world I am new here how can i comment to a question.',
+//         comments: [
+//             {
+//                 id: 'comment34555',
+//                 author: {
+//                     id: 'user10',
+//                     name: 'Abdul Vahid',
+//                     userName: 'avkp333'
+//                 },
+//                 body: '1234132432?',
+//             }
+//         ]
+//     }
+// ]
 
 const INPUT_REGEX = /[^\s\n]/;
 
 function Question() {
 
     const { id } = useParams()
-    const [answersData, setAnswersData] = useState(answers);
+    const [answersData, setAnswersData] = useState([]);
     const [question, setQuestion] = useState({});
+
     const [vote, setVote] = useState(0);
     const initialVoteCount = question.votes && question.votes.upVote.count - question.votes.downVote.count;
     const [voteCount, setVoteCount] = useState(initialVoteCount);
+
     const [input, setInput] = useState('')
     const [validInput, setValidInput] = useState(false);
+
     const [rows, setRows] = useState(2);
     const [loader, setLoader] = useState(false);
     const textAreaRef = useRef(null);
@@ -135,7 +138,24 @@ function Question() {
         email: ''
     }
 
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(false);
+    const [pageNumber, setPageNumber] = useState(0)
+    const observer = useRef()
 
+    const lastAnswerRef = useCallback(node => {
+        if (loading) return
+        if (observer.current) observer.current.disconnect()
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                setPageNumber(prevPageNumber => prevPageNumber + 1)
+            }
+        })
+        if (node) observer.current.observe(node)
+    }, [loading, hasMore])
+
+
+    //To update the vote count in question and check if user is voted or not
 
     useEffect(() => {
         if (question.votes && question.votes.upVote.userId.includes(userData ? userData._id : fakeData._id)) {
@@ -148,6 +168,7 @@ function Question() {
     }, [question])
 
 
+    //To get the question data
 
     useEffect(() => {
         const fetchData = async () => {
@@ -157,6 +178,20 @@ function Question() {
         fetchData();
     }, [id])
 
+
+    //To get answers data 
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            const response = await axios.get("/answers-data", { params: { page: pageNumber, questionId: id } });
+            const updatedAnswersData = [...answersData, ...response.data.answersData];
+            setAnswersData(updatedAnswersData);
+            setHasMore(response.data.answersCount > updatedAnswersData.length);
+            setLoading(false);
+        };
+        fetchData();
+    }, [pageNumber])
 
 
     //Tostify
@@ -293,6 +328,7 @@ function Question() {
 
 
     //Handle save question
+
     const handleSaveQuestion = async () => {
         const token = localStorage.getItem('user');
         if (!token) {
@@ -328,14 +364,15 @@ function Question() {
 
 
     //Handle share question
+
     const handleShareQuestion = () => {
         showToastMessage('linkCopied')
         navigator.clipboard.writeText(window.location.origin + location.pathname)
     }
 
 
-
     //Handle answer submit
+
     const handleAnswerSubmit = async (e) => {
         if (!validInput) {
             return;
@@ -352,7 +389,7 @@ function Question() {
                 return;
                 //Can't answer question. Please login again.
             }
-            const response = await axios.post('/question-answer', { input, questionId: question._id }, {
+            const response = await axios.post('/add-answer', { input, questionId: question._id }, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: token
@@ -531,7 +568,9 @@ function Question() {
 
                         {/* Here we are going to map the Answer component so there would be N number of answers with their own states. */}
                         {answersData && answersData.map((answer, index) => (
-                            <Answer key={answer.id} answer={answer} index={index} />
+                            (Math.floor(answersData.length * 0.75) === index + 1) ?
+                                <Answer ref={lastAnswerRef} key={answer._id} answer={answer} index={index} /> :
+                                <Answer key={answer._id} answer={answer} index={index} />
                         ))}
 
                     </div>
