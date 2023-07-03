@@ -5,14 +5,38 @@ import 'react-toastify/dist/ReactToastify.css';
 import { DownVote, UpVote } from '../../../assets/icons/Icons'
 import axios from '../../../api/axios';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const Answer = forwardRef(function Answer(props, ref) {
 
-    const { answer, index, highliteAnswer } = props;
     const location = useLocation()
+    const { answer, index, highliteAnswer } = props;
     const [isReplaying, setIsReplaying] = useState(false)
     const answerRef = useRef();
 
+    const [vote, setVote] = useState(0);
+    const initialVoteCount = answer.votes && answer.votes.upVote.count - answer.votes.downVote.count;
+    const [voteCount, setVoteCount] = useState(initialVoteCount);
+
+    const userData = useSelector((state) => state.userData.userData);
+    const fakeData = {
+        _id: '',
+        name: '',
+        username: '',
+        email: ''
+    }
+
+    //To update the vote count in answer and check if user is voted or not
+
+    useEffect(() => {
+        if (answer.votes && answer.votes.upVote.userId.includes(userData ? userData._id : fakeData._id)) {
+            setVoteCount(answer.votes.upVote.count - answer.votes.downVote.count)
+            setVote(1);
+        } else if (answer.votes && answer.votes.downVote.userId.includes(userData ? userData._id : fakeData._id)) {
+            setVoteCount(answer.votes.upVote.count - answer.votes.downVote.count)
+            setVote(-1);
+        }
+    }, [answer])
 
     //Below useEffect will handle the answer URL. By highliting the answer and scroll down to its place.
 
@@ -71,6 +95,73 @@ const Answer = forwardRef(function Answer(props, ref) {
     };
 
 
+    //Hangle upVoting answer
+
+    const upVoteHandle = async () => {
+        const token = localStorage.getItem('user');
+        if (!token) {
+            showToastMessage('noUserVote')
+        } else {
+            //Update state 
+            if (vote == -1 || vote == 0) {
+                setVote(1)
+                const response = await axios.put("/answer-vote", { voteIs: 'upVote', answerId: answer._id }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token
+                    },
+                    withCredentials: true
+                })
+                setVoteCount(response.data.voteCount)
+            } else if (vote == 1) {
+                setVote(0)
+                const response = await axios.put("/answer-vote", { voteIs: 'neutral', answerId: answer._id }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token
+                    },
+                    withCredentials: true
+                })
+                setVoteCount(response.data.voteCount)
+            }
+        }
+    }
+
+
+    //Hangle downVoting answer
+
+    const downVoteHandle = async () => {
+        const token = localStorage.getItem('user');
+        if (!token) {
+            showToastMessage('noUserVote')
+        } else {
+            //Update state
+            if (vote == 1 || vote == 0) {
+                setVote(-1)
+                const response = await axios.put("/answer-vote", { voteIs: 'downVote', answerId: answer._id }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token
+                    },
+                    withCredentials: true
+                });
+                setVoteCount(response.data.voteCount)
+            } else if (vote == -1) {
+                setVote(0)
+                const response = await axios.put("/answer-vote", { voteIs: 'neutral', answerId: answer._id }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token
+                    },
+                    withCredentials: true
+                })
+                setVoteCount(response.data.voteCount)
+            }
+        }
+    }
+
+
+
     //Handle save answer
 
     const handleSaveAnswer = async () => {
@@ -127,13 +218,13 @@ const Answer = forwardRef(function Answer(props, ref) {
                             </svg>
                         </div>
                         <div className='p-1 mt-4'>
-                            <div className='flex justify-center items-center hover:text-green-600 text-lg'>
+                            <div onClick={upVoteHandle} className={`flex justify-center items-center ${vote == 1 && 'text-green-600'} hover:bg-gray-300 rounded-md py-1 text-lg`}>
                                 <UpVote />
                             </div>
                             <div className='flex justify-center items-center text-lg'>
-                                10
+                                {voteCount}
                             </div>
-                            <div className='flex justify-center items-center hover:text-red-600 text-lg'>
+                            <div onClick={downVoteHandle} className={`flex justify-center items-center ${vote == -1 && 'text-red-600'} hover:bg-gray-300 rounded-md py-1 text-lg`}>
                                 <DownVote />
                             </div>
                         </div>
@@ -145,7 +236,7 @@ const Answer = forwardRef(function Answer(props, ref) {
                         </div>
                         <div className='mt-4'>
                             <div className='pr-1.5 mb-3'>
-                                {index + 1 + ': ' + answer.answer}  {/* Root answer with SI number(index+1) */}
+                                {answer.answer}  {/* Root answer */}
                             </div>
                             {/* <div>
                             {isReplaying ?

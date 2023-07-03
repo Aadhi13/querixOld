@@ -29,5 +29,6 @@ router.put('/question-save', userAuth, questionController.questionSave);
 router.post('/add-answer', userAuth, answerController.addAnswer);
 router.get('/answers-data', answerController.answersDataGet );
 router.put('/answer-save', userAuth, answerController.answerSave);
+router.put('/answer-vote', userAuth, answerController.answerVote); //To vote(upVote and downVote) answers 
 
 module.exports = router;

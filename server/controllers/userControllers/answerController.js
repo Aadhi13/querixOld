@@ -66,9 +66,72 @@ const answerSave = async (req, res) => {
     }
 }
 
+const answerVote = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { voteIs, answerId } = req.body;
+        const answer = await answerData.findById({ _id: new ObjectId(answerId) })
+        console.log('answer', answer);
+        if (voteIs == 'upVote') {
+            if (answer.votes.upVote.userId.includes(userId)) { //upVoted answer >> upVote
+                return res.status(304).json({ message: 'Already upVoted.' })
+            } else if (answer.votes.downVote.userId.includes(userId)) { //downVoted answer >> upVote
+                await answer.updateOne({ $pull: { 'votes.downVote.userId': userId }, $inc: { 'votes.downVote.count': -1 } });
+                await answer.updateOne({ $push: { 'votes.upVote.userId': userId }, $inc: { 'votes.upVote.count': 1 } });
+                await answer.save();
+                const { votes: { upVote: { count: upVoteCount }, downVote: { count: downVoteCount } } } = await answerData.findById(answerId);
+                const voteCount = upVoteCount - downVoteCount;
+                return res.status(200).json({ message: 'UpVoted answer.', voteCount });
+            } else {
+                await answer.updateOne({ $push: { 'votes.upVote.userId': userId }, $inc: { 'votes.upVote.count': 1 } });
+                await answer.save();
+                const { votes: { upVote: { count: upVoteCount }, downVote: { count: downVoteCount } } } = await answerData.findById(answerId);
+                const voteCount = upVoteCount - downVoteCount;
+                return res.status(200).json({ message: 'UpVoted answer.', voteCount });
+            }
+        } else if (voteIs == 'downVote') {
+            if (answer.votes.downVote.userId.includes(userId)) { //downVoted answer >> downVote
+                return res.status(304).json({ message: 'Already downVoted.' })
+            } else if (answer.votes.upVote.userId.includes(userId)) { //upvoted answer >> downVote
+                await answer.updateOne({ $pull: { 'votes.upVote.userId': userId }, $inc: { 'votes.upVote.count': -1 } });
+                await answer.updateOne({ $push: { 'votes.downVote.userId': userId }, $inc: { 'votes.downVote.count': 1 } });
+                await answer.save();
+                const { votes: { upVote: { count: upVoteCount }, downVote: { count: downVoteCount } } } = await answerData.findById(answerId);
+                const voteCount = upVoteCount - downVoteCount;
+                return res.status(200).json({ message: 'DownVoted answer.', voteCount });
+            } else {
+                await answer.updateOne({ $push: { 'votes.downVote.userId': userId }, $inc: { 'votes.downVote.count': 1 } });
+                await answer.save();
+                const { votes: { upVote: { count: upVoteCount }, downVote: { count: downVoteCount } } } = await answerData.findById(answerId);
+                const voteCount = upVoteCount - downVoteCount;
+                return res.status(200).json({ message: 'DownVoted answer.', voteCount });
+            }
+        } else if (voteIs == 'neutral') {
+            if (answer.votes.upVote.userId.includes(userId)) { //upVoted answer >> neutral
+                await answer.updateOne({ $pull: { 'votes.upVote.userId': userId }, $inc: { 'votes.upVote.count': -1 } });
+                await answer.save();
+                const { votes: { upVote: { count: upVoteCount }, downVote: { count: downVoteCount } } } = await answerData.findById(answerId);
+                const voteCount = upVoteCount - downVoteCount;
+                return res.status(200).json({ message: 'Answer is neutral.', voteCount })
+            } else if (answer.votes.downVote.userId.includes(userId)) { //downVoted answer >> neutral
+                await answer.updateOne({ $pull: { 'votes.downVote.userId': userId }, $inc: { 'votes.downVote.count': -1 } });
+                await answer.save();
+                const { votes: { upVote: { count: upVoteCount }, downVote: { count: downVoteCount } } } = await answerData.findById(answerId);
+                const voteCount = upVoteCount - downVoteCount;
+                return res.status(200).json({ message: 'Answer is neutral.', voteCount })
+            } else {
+                return res.status(304).json({ message: "Answer is already neutral." })
+            }
+        }
+
+    } catch (err) {
+        console.log(err.message);
+    }
+}
 
 module.exports = {
     addAnswer,
     answersDataGet,
-    answerSave
+    answerSave,
+    answerVote
 };
