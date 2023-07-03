@@ -71,7 +71,7 @@ const Answer = forwardRef(function Answer(props, ref) {
                 position: toast.POSITION.TOP_CENTER,
                 autoClose: 2000
             });
-        } else if (type == 'AnswerSaveSuccess') {
+        } else if (type == 'answerSaveSuccess') {
             toast.success('Answer saved.', {
                 position: toast.POSITION.TOP_CENTER,
                 autoClose: 1000
@@ -178,7 +178,7 @@ const Answer = forwardRef(function Answer(props, ref) {
                     withCredentials: true
                 })
                 if (response.data.message == 'Answer successfully saved.') {
-                    showToastMessage('AnswerSaveSuccess')
+                    showToastMessage('answerSaveSuccess')
                 }
             } catch (err) {
                 if (!err?.response) {

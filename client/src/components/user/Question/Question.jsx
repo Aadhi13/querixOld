@@ -120,17 +120,19 @@ function Question() {
     //Tostify
 
     const showToastMessage = (type) => {
-        if (type == 'noUser') {
+        if (type == 'noUserVote') {
             toast.error('Please login to vote question.', {
-                position: toast.POSITION.TOP_CENTER
-            });
-        } else if (type == 'noUserAnswer') {
-            toast.error('Please login to answer question.', {
                 position: toast.POSITION.TOP_CENTER
             });
         } else if (type == 'noUserSave') {
             toast.error('Please login to save question.', {
-                position: toast.POSITION.TOP_CENTER
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000
+            });
+        } else if (type == 'questionSaveSuccess') {
+            toast.success('Question saved.', {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 1000
             });
         } else if (type == 'linkCopied') {
             toast.success('Link copied to clipboard.', {
@@ -141,6 +143,21 @@ function Question() {
             toast.success('Answer successfully submitted.', {
                 position: toast.POSITION.TOP_CENTER,
             });
+        } else if (type == 'errorNetwork') {
+            toast.error('Network error occured.', {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 1000
+            });
+        } else if (type == 'errorServer') {
+            toast.error('Inernal server error.', {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 1000
+            });
+        } else if (type == 'errorUnknown') {
+            toast.error('Something went wrong.', {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 1000
+            });
         }
     };
 
@@ -150,7 +167,7 @@ function Question() {
     const upVoteHandle = async () => {
         const token = localStorage.getItem('user');
         if (!token) {
-            showToastMessage('noUser')
+            showToastMessage('noUserVote')
         } else {
             //Update state 
             if (vote == -1 || vote == 0) {
@@ -183,7 +200,7 @@ function Question() {
     const downVoteHandle = async () => {
         const token = localStorage.getItem('user');
         if (!token) {
-            showToastMessage('noUser')
+            showToastMessage('noUserVote')
         } else {
             //Update state
             if (vote == 1 || vote == 0) {
@@ -266,19 +283,19 @@ function Question() {
                     withCredentials: true
                 })
                 if (response.data.message == 'Question successfully saved.') {
-                    console.log('Question saved');
+                    showToastMessage('questionSaveSuccess')
                 }
             } catch (err) {
                 if (!err?.response) {
-                    console.log('No server response');
+                    showToastMessage('errorServer')
                 } else if (err.code === "ERR_NETWORK") {
-                    console.log(err.message);
+                    showToastMessage('errorNetwork')
                 } else if (err.response.data.message == 'User not found.') {
-                    console.log('User not found');
+                    showToastMessage('noUserSave')
                 } else if (err.response.data.message == "Internal server error.") {
-                    console.log('Inernal server error');
+                    showToastMessage('errorServer')
                 } else {
-                    console.log('Something went wrong.');
+                    showToastMessage('errorUnknown')
                 }
 
             }
