@@ -1,31 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useLocation } from 'react-router-dom'
 
-function Comment({ comment, index }) {
+const Comment = forwardRef(function Comment(props, ref) {
+
+    const location = useLocation()
+    const { comment, index } = props;
     const [isReplaying, setIsReplaying] = useState(false)
     const commentInputRef = useRef(null);
     const [commentInput, setCommentInput] = useState('')
     const [rows, setRows] = useState(6);
-    const location = useLocation()
     const commentRef = useRef()
-
-    //Below useEffect will handle the comment link. And highlite the comment and scroll down to its place.
-
-    useEffect(() => {
-        const hash = location.hash
-        console.log('hash', hash)
-        const id = '#' + commentRef.current.id;
-        if (hash == id) {
-            commentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            let origColor = commentRef.current.style.backgroundColor;
-            commentRef.current.style.backgroundColor = 'lightYellow';
-            setTimeout(function () {
-                commentRef.current.style.backgroundColor = origColor;
-            }, 1500);
-        }
-    }, [location.hash])
 
 
     //Tostify
@@ -48,7 +34,7 @@ function Comment({ comment, index }) {
     };
 
 
-    //To handle the textarea growing feature and changing input.body (increasing the rows when line breaks occuring in all possible ways)
+    //To handle the textarea growing feature and changing comment input (increasing the rows when line breaks occuring in all possible ways)
 
     const commentInputhandle = (e) => {
         setCommentInput(e.target.value);
@@ -86,18 +72,11 @@ function Comment({ comment, index }) {
     }
 
 
-    //Handle share comment 
-
-    const handleShareComment= () => {
-        showToastMessage('linkCopied')
-        navigator.clipboard.writeText(window.location.origin + location.pathname + '#' + comment.id)
-    }
-
     return (
         <>
             <ToastContainer />
-            <div className='w-[100%]'>
-                <div className='flex flex-row border-gray-500 border w-auto rounded-lg mb-4 mr-4' id={comment.id} ref={commentRef}>
+            <div ref={ref} key={comment._id} className='w-[100%]'>
+                <div className='flex flex-row border-gray-400 bg-yellow-50 border w-auto rounded-lg mb-4' id={comment.id} ref={commentRef}>
                     <div className='p-2'>
                         <div className='flex justify-center items-center rounded-full bg-profileBtBg w-12 h-12 overflow-hidden'>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-profileBt w-11 h-11 mt-4">
@@ -105,15 +84,16 @@ function Comment({ comment, index }) {
                             </svg>
                         </div>
                     </div>
-                    <div className='flex flex-col w-full'>
-                        <div className='my-5'>
-                            <div className='flex items-center ml-1 text-base  font-medium'>{comment.author.userName}</div>
+                    <div className='flex flex-col w-full mr-12 my-3'>
+                        <div className='mt-[1px]'>
+                            <div className='flex items-center ml-1 text-base font-medium'>{comment?.author?.name}</div>
+                            <div className='flex items-center ml-1 text-sm'>@{comment?.author?.userName}</div>
                         </div>
-                        <div className=''>
-                            <div className='mb-2 px-1.5 w-auto'>
-                                {index + 1 + ': ' + comment.body}  {/* Comment with SI number(index+1). This commet can be root comment or nested comment*/}
+                        <div className='mt-4'>
+                            <div className='pr-1.5 mb-3 ml-2'>
+                                {comment.comment}  {/* Comment body*/}
                             </div>
-                            <div className='mt-5 flex justify-start '>
+                            <div className='flex justify-start '>
                                 {isReplaying ?
                                     <div className='mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5' onClick={() => setIsReplaying(false)}>
                                         <div>
@@ -134,40 +114,41 @@ function Comment({ comment, index }) {
                                     </div>
                                 }
                                 <div className='hover:bg-gray-300 mr-2 flex justify-center items-center rounded-md p-1.5'>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 48 48">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.4em" height="1.4em" viewBox="0 0 48 48">
                                         <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M15 8C8.925 8 4 12.925 4 19c0 11 13 21 20 23.326C31 40 44 30 44 19c0-6.075-4.925-11-11-11c-3.72 0-7.01 1.847-9 4.674A10.987 10.987 0 0 0 15 8Z"></path>
                                     </svg>
                                     <button className='ml-1 text-sm font-medium '>Like</button>
                                 </div>
-                                <div className='hover:bg-gray-300 mr-2 flex justify-center items-center rounded-md p-1.5' onClick={handleShareComment}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 256 256">
-                                        <path fill="currentColor" d="m237.66 106.35l-80-80A8 8 0 0 0 144 32v40.35c-25.94 2.22-54.59 14.92-78.16 34.91c-28.38 24.08-46.05 55.11-49.76 87.37a12 12 0 0 0 20.68 9.58c11-11.71 50.14-48.74 107.24-52V192a8 8 0 0 0 13.66 5.65l80-80a8 8 0 0 0 0-11.3ZM160 172.69V144a8 8 0 0 0-8-8c-28.08 0-55.43 7.33-81.29 21.8a196.17 196.17 0 0 0-36.57 26.52c5.8-23.84 20.42-46.51 42.05-64.86C99.41 99.77 127.75 88 152 88a8 8 0 0 0 8-8V51.32L220.69 112Z"></path>
-                                    </svg>
-                                    <button className='ml-1 text-sm font-medium '>Share</button>
+                                <div className='mr-2 flex justify-center items-center hover:bg-gray-300 hover:rounded-md p-1.5'>
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div className='my-5'>
+                        <div className=''>
                             {isReplaying &&
                                 <div className='border-[2px] border-gray-200 rounded-md'>
-                                    <textarea placeholder="what's your answer to this question" ref={commentInputRef} className='border-[1px] border-red-300 rounded-t-md w-full py-2 px-5 overflow-hidden  w-[100%] outline-none text-base' onInput={commentInputhandle} rows={rows} value={commentInput}></textarea>
+                                    <textarea placeholder="what's your answer to this question" ref={commentInputRef} className='border-[1px] border-red-300 rounded-t-md py-2 px-5 overflow-hidden  w-[100%] outline-none text-base' onInput={commentInputhandle} rows={rows} value={commentInput}></textarea>
                                     <div className='bg-gray-500 relative p-4 border-[3px] border-blue-800'> {/* used relateive and abosulute to place the replay button to end of this div */}
                                         <button className='absolute right-0 bottom-0 border-[2px] border-black bg-green-400 rounded-md p-[2px]'>Reply</button>
                                     </div>
                                 </div>}
                         </div>
 
-                        {/* Maping the Comment component inside the Comment component with the comments of comment*/}
+                        {/* Maping the Comment component inside the Comment component with the comments of comment
                         <div className='w-full'>
                             {comment.comments && comment.comments.map((comment, index) => (
                                 <Comment key={comment} comment={comment} index={index} />
                             ))}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
         </>
     )
-}
+})
 
 export default Comment

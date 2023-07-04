@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
-import Comment from './Comment'
+import Comment from '../Comment/Comment'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DownVote, UpVote } from '../../../assets/icons/Icons'
@@ -95,7 +95,7 @@ const Answer = forwardRef(function Answer(props, ref) {
     };
 
 
-    //Hangle upVoting answer
+    //Handle upVoting answer
 
     const upVoteHandle = async () => {
         const token = localStorage.getItem('user');
@@ -128,7 +128,7 @@ const Answer = forwardRef(function Answer(props, ref) {
     }
 
 
-    //Hangle downVoting answer
+    //Handle downVoting answer
 
     const downVoteHandle = async () => {
         const token = localStorage.getItem('user');
@@ -210,7 +210,7 @@ const Answer = forwardRef(function Answer(props, ref) {
 
             <ToastContainer />
             <div ref={ref} key={answer._id} >
-                <div className='flex flex-row border-gray-300 border rounded-lg mb-4 bg-sky-100' id={answer._id} ref={answerRef}>
+                <div className='flex flex-row border-gray-400 border rounded-lg mb-4 bg-sky-50' id={answer._id} ref={answerRef}>
                     <div className='p-2'>
                         <div className='flex justify-center items-center rounded-full bg-profileBtBg w-12 h-12 overflow-hidden'>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-profileBt w-11 h-11 mt-4">
@@ -267,7 +267,7 @@ const Answer = forwardRef(function Answer(props, ref) {
                                 </div>
                                 <div className='mr-2 flex justify-center items-center hover:bg-gray-300 hover:rounded-md p-1.5'>
                                     <div>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                                         </svg>
                                     </div>

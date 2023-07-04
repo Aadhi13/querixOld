@@ -6,6 +6,7 @@ const authController = require('../controllers/userControllers/authController');
 const questionController = require('../controllers/userControllers/questionController');
 const forgotPasswordController = require('../controllers/userControllers/forgotPasswordController');
 const answerController = require('../controllers/userControllers/answerController');
+const commentController = require('../controllers/userControllers/commentController');
 
 router.get('/user-data', userAuth, authController.userDataGet); //Get user data from jwt token
 
@@ -27,8 +28,11 @@ router.put('/question-vote', userAuth, questionController.questionVote); //To vo
 router.put('/question-save', userAuth, questionController.questionSave);
 
 router.post('/add-answer', userAuth, answerController.addAnswer);
-router.get('/answers-data', answerController.answersDataGet );
+router.get('/answers-data', answerController.answersDataGet);
 router.put('/answer-save', userAuth, answerController.answerSave);
 router.put('/answer-vote', userAuth, answerController.answerVote); //To vote(upVote and downVote) answers 
+
+router.post('/add-comment', userAuth, commentController.addComment);
+router.get('/comments-data', commentController.commentsDataGet);
 
 module.exports = router;

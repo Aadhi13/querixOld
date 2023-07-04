@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 
-const questionSchema = new mongoose.Schema({
-    userId: {
+const commentSchema = new mongoose.Schema({
+    author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users"
     },
-    question: Object,
-    tags: [],
+    comment: Object,
+    question: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'questions'
+    },
     votes: {
         upVote: {
             count: {
@@ -29,26 +32,6 @@ const questionSchema = new mongoose.Schema({
             }]
         },
     },
-    views: {
-        count: {
-            type: Number,
-            default: 0
-        },
-        unique: [{
-            userId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "users"
-            },
-            timestamp: {
-                type: Date,
-                default: Date.now
-            }
-        }]
-    },
-    answers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "answers"
-    }],
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "comments"
@@ -57,4 +40,5 @@ const questionSchema = new mongoose.Schema({
     { timestamps: true }
 );
 
-module.exports = mongoose.model("questions", questionSchema);
+
+module.exports = mongoose.model("comments", commentSchema);
