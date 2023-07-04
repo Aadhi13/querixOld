@@ -12,6 +12,7 @@ import ForgotPassword from "../pages/user/FogotPasswordPage";
 import '../assets/styles/user.css';
 
 import AuthenticatedRoute from "../utils/AuthenticatedRoute";
+import NotFound from "../pages/Error/NotFound";
 
 function UserRoutes() {
   return (
@@ -23,6 +24,7 @@ function UserRoutes() {
         <Route path="signin" element={<Signin />} />
         <Route path="question/:id" element={<Question />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="*" element={<NotFound />} />
       </Route >
     </Routes>
   )

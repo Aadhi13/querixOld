@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
 import Answer from '../Answers/Answer';
 import Comment from '../Comment/Comment';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from '../../../api/axios';
 import { useSelector } from 'react-redux';
 
@@ -13,6 +13,7 @@ const INPUT_REGEX = /[^\s\n]/;
 
 function Question() {
 
+    const navigate = useNavigate();
     const location = useLocation()
     const { id } = useParams()
     const [answersData, setAnswersData] = useState([]);
@@ -96,8 +97,17 @@ function Question() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await axios.get(`/question-data/${id}`);
-            setQuestion(response.data.singleQuestionData)
+            try {
+                const response = await axios.get(`/question-data/${id}`);
+                setQuestion(response.data.singleQuestionData)
+            } catch (err) {
+                console.log(err.message);
+                if (err.response.data.message == 'Invalid question') {
+                    //404 error
+                    console.log('404 error; question is invalid.');
+                    navigate('*')
+                }
+            }
         };
         fetchData();
     }, [id])

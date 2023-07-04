@@ -46,9 +46,16 @@ const questionDataGet = async (req, res) => {
     try {
         console.log('req.params.questionId', req.params.questionId)
         const questionId = req.params.questionId
-        const singleQuestionData = await questionData.findById({ _id: questionId })
-            .populate('userId', 'userName name')
-        return res.status(200).json({ message: 'Question data sended', singleQuestionData });
+        try {
+            const singleQuestionData = await questionData.findById({ _id: new ObjectId(questionId) }).populate('userId', 'userName name')
+            if (singleQuestionData) {
+                return res.status(200).json({ message: 'Question data sended', singleQuestionData });
+            } else {
+                return res.status(404).json({ message: 'Invalid question' });
+            }
+        } catch(err) {
+            return res.status(404).json({ message: 'Invalid question' });
+        }
     } catch (err) {
         console.log(err.message)
     }
