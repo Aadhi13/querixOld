@@ -24,7 +24,7 @@ function NotFound() {
                         home page.{" "}
                     </p>
                     <button onClick={() => navigate('/')} ref={buttonRef} tabIndex={0}
-                        className="inline-flex text-white hover:text-black hover:bg-gray-200 bg-black font-semibold rounded-md text-sm px-5 py-2.5 text-center mt-8"
+                        className="inline-flex text-white hover:bg-gray-800 bg-black font-semibold rounded-md text-sm px-5 py-2.5 text-center mt-8"
                     >
                         Back to Homepage
                     </button>

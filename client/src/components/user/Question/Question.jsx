@@ -101,10 +101,8 @@ function Question() {
                 const response = await axios.get(`/question-data/${id}`);
                 setQuestion(response.data.singleQuestionData)
             } catch (err) {
-                console.log(err.message);
                 if (err.response.data.message == 'Invalid question') {
                     //404 error
-                    console.log('404 error; question is invalid.');
                     navigate('*')
                 }
             }
