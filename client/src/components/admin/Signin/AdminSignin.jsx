@@ -1,6 +1,6 @@
-import { Info, Check, Cross } from "../../assets/icons/Icons";
+import { Info, Check, Cross } from "../../../assets/icons/Icons";
 import React, { useEffect, useRef, useState } from "react";
-import axios from "../../../src/api/axios";
+import axios from "../../../api/axios";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 const EMAIL_REGEX = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
@@ -63,22 +63,17 @@ function AdminLogin() {
             setLoader(true);
             const response = await axios.post("/admin/signin", data);
             setLoader(false);
-            console.log(response.data.accessToken, 'accessToken');
-            console.log(response.data.message);
-            console.log(response.status);
             if (response.data.message === 'Access Token is created.') {
                 localStorage.setItem('admin', response.data.accessToken);
                 navigate('/admin/');
             }
         } catch (err) {
             setLoader(false);
-            console.log(err.code);
-            console.log(err.message);
             if (!err?.response) {
                 setErrMsg('No server response.');
             } else if (err.code === "ERR_NETWORK") {
                 setErrMsg(err.message);
-            } else if (err.response.data.message === 'Invalid credentials') {
+            } else if (err.response.data.message === 'Invalid credentials.') {
                 setErrMsg("Email/Password is incorrect.");
             } else if (err.response.data.message === 'Internal server error.') {
                 setErrMsg("Internal server error.");
@@ -93,11 +88,11 @@ function AdminLogin() {
 
     return (
         <>
-            <div className='items-center justify-center flex' style={{ height: '100vh' }}>
+            <div className='items-center justify-center flex' style={{ height: '85vh' }}>
                 <div className="">
-                    <div className="rounded-lg shadow-lg shadow-gray-300 bg-gray-100 w-90 h-auto">
-                        <div style={{ width: "362px" }} className="px-10 sm:p-6">
-                            <h1 className="text-3xl select-none font-semibold  font-roboto ">
+                    <div className="rounded-lg shadow-lg shadow-gray-300 bg-gray-100 w-full h-auto">
+                        <div style={{ width: "362px" }} className="px-10 p-6">
+                            <h1 className="text-3xl text-black tracking-wide select-none font-semibold uppercase text-center">
                                 Admin Sign in
                             </h1>
                             <p
@@ -122,12 +117,12 @@ function AdminLogin() {
                                             onBlur={handleBlur}
                                         />
                                         {validData.email && (
-                                            <div style={{ marginLeft: '273px' }} className="absolute -mt-12 text-green-400 text-xl pointer-events-none">
+                                            <div style={{ marginLeft: '246px' }} className="absolute -mt-12 text-green-400 text-xl pointer-events-none">
                                                 <Check />
                                             </div>
                                         )}
                                         {!validData.email && data.email && (
-                                            <div style={{ marginLeft: '273px' }} className="absolute -mt-12 text-red-400 text-xl pointer-events-none">
+                                            <div style={{ marginLeft: '246px' }} className="absolute -mt-12 text-red-400 text-xl pointer-events-none">
                                                 <Cross />
                                             </div>
                                         )}
@@ -158,12 +153,12 @@ function AdminLogin() {
                                             onBlur={handleBlur}
                                         />
                                         {validData.password && (
-                                            <div style={{ marginLeft: '273px' }} className="absolute -mt-12 text-green-400 text-xl pointer-events-none">
+                                            <div style={{ marginLeft: '246px' }} className="absolute -mt-12 text-green-400 text-xl pointer-events-none">
                                                 <Check />
                                             </div>
                                         )}
                                         {!validData.password && data.password && (
-                                            <div style={{ marginLeft: '273px' }} className="absolute -mt-12 text-red-400 text-xl pointer-events-none">
+                                            <div style={{ marginLeft: '246px' }} className="absolute -mt-12 text-red-400 text-xl pointer-events-none">
                                                 <Cross />
                                             </div>
                                         )}
@@ -179,7 +174,7 @@ function AdminLogin() {
                                         </p>
                                     </div>
                                     <button
-                                        className="w-full select-none p-4 bg-linkedin rounded-full text-white text-base font-roboto mt-3 font-semibold hover:bg-linkedin2 disabled:hover:bg-linkedin disabled:opacity-60"
+                                        className="w-full select-none p-4 bg-black  rounded-full text-white text-base font-roboto mt-3 font-semibold hover:bg-gray-800 disabled:hover:bg-black disabled:opacity-80"
                                         disabled={
                                             !validData.email ||
                                                 !validData.password ||

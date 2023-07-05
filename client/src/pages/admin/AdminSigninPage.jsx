@@ -1,6 +1,6 @@
 import React from 'react'
 
-import AdminSignin from "../../components/admin/AdminSignin"
+import AdminSignin from "../../components/admin/Signin/AdminSignin"
 
 function AdminSigninPage() {
     return (
