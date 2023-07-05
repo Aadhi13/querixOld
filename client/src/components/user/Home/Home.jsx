@@ -15,7 +15,7 @@ const INPUT_REGEX = /[^\s\n]/;
 function Home() {
     const [input, setInput] = useState({
         title: '',
-        body: ''
+        body: '',
     });
     const [validInput, setValidInput] = useState({
         title: false,
