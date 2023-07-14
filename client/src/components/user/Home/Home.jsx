@@ -4,11 +4,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useActionData } from 'react-router-dom'
 import axios from "../../../api/axios";
 import { useSelector, useDispatch } from 'react-redux';
-import { getUserData, logout } from '../../../redux/features/userDataSlice';
-import { menuHide } from '../../../redux/features/menuSlice';
-import { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
+import { getUserData, logout } from '../../../redux/features/user/userDataSlice';
+import { menuHide } from '../../../redux/features/user/menuSlice';
+import SpinningWheel, { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
 import QuestionHome from './QuestionHome';
-import spinnerBlack from '../../../assets/Images/spinner-black-trans.gif'
+import { MdWidthFull } from 'react-icons/md';
 
 const INPUT_REGEX = /[^\s\n]/;
 
@@ -318,9 +318,8 @@ function Home() {
                 ))}
 
                 {loading &&
-                    <div className='flex justify-center items-center mx-56 rounded-lg mb-4'>
-                        <img src={spinnerBlack} alt="A spinning wheel / loading" width="35px" />
-                        &nbsp;&nbsp;Loading...
+                    <div className='flex justify-center items-center mx-56 rounded-lg my-20`'>
+                        <SpinningWheel height={"1.5em"} width={"1.5em"} />
                     </div>
                 }
             </div >

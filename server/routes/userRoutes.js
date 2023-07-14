@@ -2,13 +2,13 @@ const router = require('express').Router();
 const userAuth = require('../middlewares/userAuth');
 
 const signinSignupController = require('../controllers/userControllers/signin&signup');
-const authController = require('../controllers/userControllers/authController');
+const userController = require('../controllers/userControllers/userController');
 const questionController = require('../controllers/userControllers/questionController');
 const forgotPasswordController = require('../controllers/userControllers/forgotPasswordController');
 const answerController = require('../controllers/userControllers/answerController');
 const commentController = require('../controllers/userControllers/commentController');
 
-router.get('/user-data', userAuth, authController.userDataGet); //Get user data from jwt token
+router.get('/user-data', userAuth, userController.userDataGet); //Get user data from jwt token
 
 router.post('/signup', signinSignupController.userSignup); //Sign up post request to create user account and send otp to verification
 router.post('/otp-verify', signinSignupController.otpVerify); //Email verification through otp

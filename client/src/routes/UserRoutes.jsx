@@ -11,7 +11,7 @@ import ForgotPassword from "../pages/user/FogotPasswordPage";
 
 import '../assets/styles/user.css';
 
-import AuthenticatedRoute from "../utils/AuthenticatedRoute";
+import IsAuthenticated from "../utils/user/IsAuthenticated";
 import NotFound from "../pages/Error/NotFound";
 
 function UserRoutes() {
@@ -21,7 +21,7 @@ function UserRoutes() {
         <Route index element={<Home />} />
         <Route path="signup" element={<Signup />} />
         <Route path="otp-verify" element={<OtpVerify />} />
-        <Route path="signin" element={<Signin />} />
+        <Route path="signin" element={<IsAuthenticated><Signin /></IsAuthenticated>} />
         <Route path="question/:id" element={<Question />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="*" element={<NotFound />} />

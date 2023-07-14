@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
+import SpinningWheel, { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
 import Answer from '../Answers/Answer';
 import Comment from '../Comment/Comment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -636,6 +636,7 @@ function Question() {
                             <h1 className='mx-60 text-3xl font-bold mb-4'>Answers</h1>
                             <div className='mx-56'>
 
+                                {/* Here we are gonna display the input box for answering based on user is logged in or not. */}
                                 {userData ?
                                     <div className='flex flex-row border-gray-400 border  rounded-lg mb-4'>
                                         <div className='p-2 flex flex-col items-center'>
@@ -673,16 +674,26 @@ function Question() {
                                     </div>
                                     :
                                     // If the user is not signed in 
-                                    <div className='py-4 mb-3 text-lg font-semibold'>Login to answer question <Link to='/signin' className='text-blue-500'>Sign In</Link></div>
+                                    <div className='py-4 mb-3 text-lg font-semibold'>To answer question <Link to='/signin' className='text-blue-500 hover:text-blue-700'>Sign In</Link></div>
                                 }
 
                                 {/* Here we are going to map the Answer component so there would be N number of answers with their own states. */}
-                                {answersData && answersData.map((answer, index) => (
+                                {Array.isArray(question.answers) && question.answers.length > 0 ? answersData.map((answer, index) => (
+
                                     (Math.floor(answersData.length * 0.75) === index + 1) ?
                                         // (index === answersData.length - 3) ?
                                         <Answer ref={lastAnswerRef} key={answer._id} answer={answer} index={index} highliteAnswer={highliteAnswer} /> :
                                         <Answer key={answer._id} answer={answer} index={index} highliteAnswer={highliteAnswer} />
-                                ))}
+                                )) :
+                                    //If there is no answers
+                                    <div className='text-center text-xl tracking-wide font-semibold mt-12'>Be the first one to answer to <span className='text-linkedin'>{question?.userId?.name}</span>'s question.</div>
+                                }
+
+                                {loading &&
+                                    <div className='flex justify-center items-center mx-56 rounded-lg my-20`'>
+                                        <SpinningWheel height={"1.5em"} width={"1.5em"} />
+                                    </div>
+                                }
 
                             </div>
                         </div>
@@ -694,6 +705,7 @@ function Question() {
                             <h1 className='mx-60 text-3xl font-bold mb-4'>Comments</h1>
                             <div className='mx-56'>
 
+                                {/* Here we are going to display the input box for commenting based on the user is logged in or not. */}
                                 {userData ?
                                     <div className='flex flex-row border-gray-400 border  rounded-lg mb-4'>
                                         <div className='p-2 flex flex-col items-center'>
@@ -731,16 +743,25 @@ function Question() {
                                     </div>
                                     :
                                     // If the user is not signed in 
-                                    <div className='py-4 mb-3 text-lg font-semibold'>Login to answer question <Link to='/signin' className='text-blue-500'>Sign In</Link></div>
+                                    <div className='py-4 mb-3 text-lg font-semibold'>To comment question <Link to='/signin' className='text-blue-500 hover:text-blue-700'>Sign In</Link></div>
                                 }
 
                                 {/* Here we are going to map the Comment component so there would be N number of Comments with their own states. */}
-                                {commentsData && commentsData.map((comment, index) => (
+                                {Array.isArray(question.comments) && question.comments.length > 0 ? commentsData.map((comment, index) => (
                                     (Math.floor(commentsData.length * 0.75) === index + 1) ?
                                         // (index === commentsData.length - 3) ?
                                         <Comment ref={lastCommentRef} key={comment._id} comment={comment} index={index} /> :
                                         <Comment key={comment._id} comment={comment} index={index} />
-                                ))}
+                                )) :
+                                    //If there is no comments
+                                    <div className='text-center text-xl tracking-wide font-semibold mt-12'>Be the first one to comment to <span className='text-linkedin'>{question?.userId?.name}</span>'s question.</div>
+                                }
+
+                                {loadingComment &&
+                                    <div className='flex justify-center items-center mx-56 rounded-lg my-20`'>
+                                        <SpinningWheel height={"1.5em"} width={"1.5em"} />
+                                    </div>
+                                }
 
                             </div>
                         </div>
@@ -748,7 +769,7 @@ function Question() {
                 )}
 
 
-            </div>
+            </div >
         </>
     )
 }

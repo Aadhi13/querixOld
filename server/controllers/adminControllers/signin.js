@@ -9,7 +9,7 @@ const adminSignin = async (req, res) => {
         if (adminDetails) {
             const match = await comparePassword(password, adminDetails.password);
             if (match) {
-                const accessToken = jwt.sign({ id: adminDetails._id }, process.env.JWT_SECRET, { expiresIn: '1800s' }); //30 minutes expiration time
+                const accessToken = jwt.sign({ id: adminDetails._id }, process.env.ADMIN_JWT_SECRET, { expiresIn: '3600s' }); //30 minutes expiration time
                 return res.status(201).json({ message: 'Access Token is created.', accessToken });
             } else {
                 return res.status(401).json({ message: 'Invalid credentials.' });

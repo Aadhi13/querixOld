@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "../../api/axios";
+import axios from "../../../api/axios";
 
 const getUserData = createAsyncThunk('userData/getUserData', async (user, thunkAPI) => {
     try {
@@ -14,12 +14,8 @@ const getUserData = createAsyncThunk('userData/getUserData', async (user, thunkA
         }));
         return response.data.data;
     } catch (err) {
-        console.log('err',err.message);
-        if (err.response.data.message == 'Invalid jwt token.' || err.response.data.message == 'Jwt expired.') {
+        if (err.response.data.message == 'Invalid jwt token.' || err.response.data.message == 'Jwt expired.' || err.response.data.message == 'No jwt token.') {
             localStorage.removeItem('user');
-            return thunkAPI.rejectWithValue(err.response.data.message)
-        } else if (err.response.data.message == 'No jwt token.') {
-            localStorage.removeItem('user')
             return thunkAPI.rejectWithValue(err.response.data.message)
         }
         return thunkAPI.rejectWithValue(err)

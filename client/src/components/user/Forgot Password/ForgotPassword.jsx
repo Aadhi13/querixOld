@@ -165,6 +165,3 @@ function ForgotPassword({ onSubmit }) {
 }
 
 export default ForgotPassword
-
-
-//We couldn’t find an account associated with adhilameenpj13@gmail.com. Please try with an alternate email or phone number.
