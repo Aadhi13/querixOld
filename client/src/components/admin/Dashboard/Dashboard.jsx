@@ -1,21 +1,32 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Analytics from "./Analytics";
-import FAQ from "./FAQ"
 import Navbar from "./Navbar";
 import scrollreveal from "scrollreveal";
 import { useDispatch } from "react-redux";
 import { getAdminData } from "../../../redux/features/admin/adminDataSlice"
+import BarChart from "../Chart/BarChart";
+import { UserData } from "../Chart/Data";
+import LineChart from "../Chart/LineChart";
+import PieChart from "../Chart/PieChart";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
   dispatch(getAdminData());
+  const [userData, setUserData] = useState({
+    labels: UserData.map((data) => data.year),
+    datasets: [{
+      label: "Users Gained",
+      data: UserData.map((data) => data.userGain),
+      backgroundColor: ['black', 'gray', 'red', 'blue',]
+    }]
+  })
+
 
   useEffect(() => {
-    console.log('useEffect for scroll reveal started working')
     const sr = scrollreveal({
       origin: "bottom",
-      distance: "80px",
+      distance: "150px",
       duration: 2000,
       reset: false,
     });
@@ -26,7 +37,7 @@ export default function Dashboard() {
         `,
       {
         opacity: 0,
-        interval: 100,
+        interval: 500,
       }
     );
   }, []);
@@ -34,11 +45,17 @@ export default function Dashboard() {
 
   return (
     <div>
-      <Section>
+      <Section className="justi item">
         <Navbar />
         <div className="grid">
           <div className="row__one">
             <Analytics />
+            <div className="text-white border w-[800px] bg-red-200">
+              <h1 className="text-2xl">Chart & Graph</h1>
+              <BarChart chartData={userData}/>
+              <LineChart chartData={userData}/>
+              <PieChart chartData={userData}/>
+            </div>
           </div>
         </div>
       </Section>

@@ -13,7 +13,6 @@ export default function IsAuthenticated({ children }) {
         dispatch(getAdminData());
         //after running above function if admin is logged in then the 'admin' key in localstorge will remain other wise it will be removed.
         if (localStorage.getItem('admin')) {
-            console.log('We got the admin in local storage')
             //admin is logged in. 
             if (location.pathname == '/admin/signin') {
                 //If admin is accessing the '/signin' route when signed in then goes to home page.
@@ -21,7 +20,7 @@ export default function IsAuthenticated({ children }) {
             }
         } else {
             // admin is not logged in 
-            if (location.pathname == '/admin/') {
+            if (location.pathname.startsWith('/admin/') && location.pathname !== '/admin/signin') {
                 navigate('/admin/signin');
             }
         }

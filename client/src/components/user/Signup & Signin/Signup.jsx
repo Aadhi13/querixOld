@@ -63,7 +63,6 @@ function Signup() {
   }, [])
 
   async function handleGoogleSignInCallback(response) {
-    console.log('Encoded JWT ID token: ', response.credential)
     try {
       const res = await axios.post('/signin-google', {}, {
         headers: {

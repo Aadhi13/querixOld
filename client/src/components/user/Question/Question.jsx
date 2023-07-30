@@ -80,6 +80,7 @@ function Question() {
     }, [loadingComment, hasMoreComment])
 
 
+
     //To update the vote count in question and check if user is voted or not
 
     useEffect(() => {
@@ -114,6 +115,7 @@ function Question() {
     //To get answers data 
 
     useEffect(() => {
+        console.log('useEffect for getting answers data');
         const fetchData = async () => {
             setLoading(true);
             const response = await axios.get("/answers-data", { params: { page: pageNumber, questionId: id } });
@@ -435,7 +437,6 @@ function Question() {
             setLoader(true);
             const token = localStorage.getItem('user')
             if (!token) {
-                console.log(`no token can't answer question.`);
                 setInput('');
                 setRows(2);
                 showToastMessage('noUserAnswer')
@@ -455,10 +456,11 @@ function Question() {
                 setInput('');
                 setRows(2);
                 showToastMessage('successAnswer');
+                window.location.reload(false);
+
             }
             setLoader(false);
         } catch (err) {
-            console.log(err);
             if (err == 'no token') {
                 setInput('');
                 setRows(2);
@@ -496,7 +498,6 @@ function Question() {
             setLoaderComment(true);
             const token = localStorage.getItem('user')
             if (!token) {
-                console.log(`no token can't comment question.`);
                 setCommentInput('');
                 setRowsComment(2);
                 showToastMessage('noUserComment')
@@ -516,10 +517,10 @@ function Question() {
                 setCommentInput('');
                 setRowsComment(2);
                 showToastMessage('successComment');
+                window.location.reload(false);
             }
             setLoaderComment(false);
         } catch (err) {
-            console.log(err);
             if (err == 'no token') {
                 setCommentInput('');
                 setRowsComment(2);

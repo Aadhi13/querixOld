@@ -133,6 +133,7 @@ const userSigninGoogle = async (req, res) => {
         const userExist = await userData.findOne({ email });
         if (userExist) {
             const userDetails = await userData.findOne({ email });
+            if (userDetails.blockStatus == true) return res.status(403).json({ message: 'Access Denied: Your account has been suspended.' });
             const accessToken = jwt.sign({ id: userDetails._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
             return res.status(201).json({ message: 'Access Token is created.', accessToken });
         } else {

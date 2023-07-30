@@ -1,13 +1,13 @@
 import React from 'react'
 import styled from 'styled-components';
-import Dashboard from '../../components/admin/Dashboard/Dashboard'
 import Sidebar from '../../components/admin/Dashboard/Sidebar';
-import '../../assets/styles/admin/adminDashboardPage.css'
-export default function AdminDashboardPage() {
+import QuestionManage from '../../components/admin/Questions/QuestionManage';
+export default function AdminQuestionManagePage() {
     return (
         <Div style={{ backgroundColor: 'black', height: "100vh" }} >
-            <Sidebar defaultCurrentLink={1} />
-            <Dashboard />
+            <Sidebar defaultCurrentLink={3}/>
+            <QuestionManage />
+            
         </Div>
     )
 }

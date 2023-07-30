@@ -52,7 +52,6 @@ function Signin() {
     }, []);
 
     async function handleGoogleSignInCallback(response) {
-        console.log("Encoded JWT ID token: ", response.credential);
         try {
             const res = await axios.post(
                 "/signin-google",
@@ -70,12 +69,14 @@ function Signin() {
                 navigate("/");
             }
         } catch (err) {
-            if (!err?.res) {
-                setErrMsg("No server response.");
-            } else if (err.message == "No jwt token.") {
+            console.log(err.response.data.message == "Access Denied: Your account has been suspended.");
+            if (err.message == "No jwt token.") {
                 setErrMsg("Something went wrong.");
             } else if (err.message == "Something went wrong.") {
                 setErrMsg("Something went wrong.");
+            } else if (err.response.data.message == "Access Denied: Your account has been suspended.") {
+                console.log('we got error');
+                setErrMsg("Access Denied; Your account has been suspended. Contact customer support for further information.")
             } else {
                 setErrMsg("Signin Failed.");
             }
@@ -131,9 +132,7 @@ function Signin() {
             }
         } catch (err) {
             setLoader(false);
-            if (!err?.response) {
-                setErrMsg("No server response.");
-            } else if (err.code === "ERR_NETWORK") {
+            if (err.code === "ERR_NETWORK") {
                 setErrMsg(err.message);
             } else if (err.response.data.message === "Invalid credentials") {
                 setErrMsg("Email/Password is incorrect.");
@@ -143,6 +142,8 @@ function Signin() {
                 setErrMsg("Internal server error.");
             } else if (err.response.data.message === "Something went wrong.") {
                 setErrMsg("Something went wrong.");
+            } else if (err.response.data.message === "Access Denied: Your account has been suspended.") {
+                setErrMsg("Access Denied; Your account has been suspended. Contact customer support for further information.")
             } else {
                 setErrMsg("Signin Failed.");
             }

@@ -109,7 +109,6 @@ function Home() {
             setLoader(true);
             const token = localStorage.getItem('user')
             if (!token) {
-                console.log('no token from question submit');
                 setInput({
                     title: '',
                     body: '',
@@ -135,10 +134,11 @@ function Home() {
                 });
                 setTags([]);
                 showToastMessage('success');
+                setLoader(false);
+                window.location.reload(false);
             }
             setLoader(false);
         } catch (err) {
-            console.log(err);
             if (err == 'no token') {
                 setInput({
                     title: '',

@@ -79,7 +79,6 @@ function OtpVerify() {
             if (remainingTime > 0) {
                 intervalId = setInterval(() => {
                     setRemainingTime(calculateRemainingTime());
-                    console.log('interval');
                 }, 1000);
             }
             return () => clearInterval(intervalId);

@@ -30,7 +30,7 @@ const questionsDataGet = async (req, res) => {
     try {
         console.log('req.query.page', req.query.page)
         const { page } = req.query;
-        const questionsData = await questionData.find()
+        const questionsData = await questionData.find({ blockStatus: { $ne: true } })
             .skip(4 * page)
             .limit(4)
             .populate('userId', 'userName name')

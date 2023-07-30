@@ -5,17 +5,20 @@ import { BiSearch } from "react-icons/bi";
 export default function Navbar() {
   return (
     <Nav >
-      <div className="titleNav">
-        <h5 className="text-2xl">Hi Admin,</h5>
-        <h1 className="text-5xl">
-          Welcome to <span>Querix </span>
-        </h1>
+      <div className="w-full flex flex-col sm:flex-row justify-between">
+        <div className="titleNav">
+          <h5 className="text-lg xs:text-xl sm:text-2xl">Hi Admin,</h5>
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl">
+            Welcome to <span>Querix </span>
+          </h1>
+        </div>
+        {/* sm:w-[3px] md:w-[14rem] lg:w-[17rem] ml:w-[14rem] xl:w-[20rem] */}
+        {/* <div className="search mt-8 sm:mt-0 w-[8rem] ml:w-[14rem] lg:w-[17rem] xl:w-[20rem]"> */}
+        <div className="flex items-center flex-row search mt-8 sm:mt-0 sm:w-auto w-[240px]">
+          <BiSearch className="text-2xl flex-shrink-0 " />
+          <input type="text" placeholder="Search" className="text-[#ffc107] sm:hidden md:block md:w-[7rem] lg:w-[10rem] ml:w-[12rem] xl:w-[14rem]" />
+        </div>
       </div>
-      <div className="search">
-        <BiSearch />
-        <input type="text" placeholder="Search" />
-      </div>
-      
     </Nav>
   );
 }
@@ -29,7 +32,6 @@ const Nav = styled.nav`
   .titleNav {
     h1 {
       span {
-        margin-left: 0.5rem;
         color: #ffc107;
         font-family: "Permanent Marker", cursive;
         letter-spacing: 0.2rem;
@@ -39,20 +41,15 @@ const Nav = styled.nav`
   }
   .search {
     background-color: #212121;
-    display: flex;
-    align-items: center;
     gap: 1rem;
-    width: 23rem;
     height: 4rem;
-    padding: 1rem 8rem 1rem 1rem;
+    padding: 1rem 1rem 1rem 1rem;
     border-radius: 1rem;
     svg {
       color: #ffc107;
     }
     input {
       background-color: transparent;
-      border: none;
-      color: #ffc107;
       font-family: "Permanent Marker", cursive;
       letter-spacing: 0.3rem;
       &:focus {
@@ -64,17 +61,7 @@ const Nav = styled.nav`
       }
     }
   }
-  @media screen and (min-width: 280px) and (max-width: 1080px) {
-    flex-direction: column;
-    .title {
-      h1 {
-        span {
-          display: block;
-
-          margin: 1rem 0;
-          /* letter-spacing: 0; */
-        }
-      }
-    }
-  }
+  // @media screen and (min-width: 280px) and (max-width: 1080px) {
+  //   }
+  // }
 `;

@@ -11,20 +11,25 @@ import { RiLogoutCircleRLine } from "react-icons/ri";
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom'
 import '../../../assets/styles/admin/adminSidebar.css';
+import { useDispatch } from "react-redux";
+import { getAdminData } from "../../../redux/features/admin/adminDataSlice";
 
 
-export default function Sidebar() {
+export default function Sidebar(props) {
+  const { defaultCurrentLink } = props;
   const navigate = useNavigate()
-  const [currentLink, setCurrentLink] = useState(1);
+  const [currentLink, setCurrentLink] = useState(defaultCurrentLink || 1);
   const [navbarState, setNavbarState] = useState(false);
   const html = document.querySelector("html");
   html.addEventListener("click", () => setNavbarState(false));
 
+  const dispatch = useDispatch();
+  dispatch(getAdminData());
 
   //logout function
   const handleLogout = (e) => {
     localStorage.removeItem("admin")
-    navigate('/admin/signin')
+    navigate('/admin/signin');
     message.success("Logout successfully")
   }
 
@@ -51,39 +56,50 @@ export default function Sidebar() {
           </div>
           <div className="links">
             <ul>
-              <li className={currentLink === 1 ? "active" : "none"} onClick={() => setCurrentLink(1)} >
+              <li className={currentLink === 1 ? "active" : "none"} onClick={() => setCurrentLink(1)}>
                 <a onClick={() => { navigate('/admin/') }} >
                   <div ><MdSpaceDashboard style={{ width: "25px" }} /></div>
-                  <span className="buttonsDashboard" > Dashboard</span>
+                  <span className="buttonsDashboard"  > Dashboard</span>
                 </a>
               </li>
               <li className={currentLink === 2 ? "active" : "none"} onClick={() => setCurrentLink(2)} >
                 <a onClick={() => { navigate('/admin/user-manage') }}>
                   <div><HiUsers style={{ width: "25px" }} /></div>
-                  <span className="buttonsDashboard" > Users</span>
+                  <span className="buttonsDashboard"   > Users</span>
                 </a>
               </li>
               <li className={currentLink === 3 ? "active" : "none"} onClick={() => setCurrentLink(3)} >
+                <a onClick={() => { navigate("/admin/question-manage") }}>
+                  <div><AiOutlineTag style={{ width: "25px" }} /></div>
+                  <span className="buttonsDashboard" > Questions</span>
+                </a>
+              </li>
+              <li className={currentLink === 4 ? "active" : "none"} onClick={() => setCurrentLink(4)} >
                 <a onClick={() => { navigate('/admin/reported-question-manage') }}>
                   <div> <FaAddressCard style={{ width: "25px" }} /></div>
                   <span className="buttonsDashboard" > Reported Questions</span>
                 </a>
               </li>
               <li className={currentLink === 5 ? "active" : "none"} onClick={() => setCurrentLink(5)} >
-                <a onClick={() => { navigate("/admin/question-manage") }}>
+                <a onClick={() => { navigate('/admin/reported-answer-manage') }}>
+                  <div> <GiTwirlCenter style={{ width: "25px" }} /></div>
+                  <span className="buttonsDashboard" > Reported Answers</span>
+                </a>
+              </li>
+              <li className={currentLink === 6 ? "active" : "none"} onClick={() => setCurrentLink(6)} >
+                <a onClick={() => { navigate('/admin/reported-comments-manage') }}>
                   <div> <BsFillChatTextFill style={{ width: "25px" }} /></div>
-                  <span className="buttonsDashboard" > Questions</span>
+                  <span className="buttonsDashboard" > Reported Comments</span>
                 </a>
               </li>
             </ul>
           </div>
         </div>
-
         <div className="logout">
           <RiLogoutCircleRLine style={{ color: "#fff", fontSize: "24px" }} onClick={handleLogout} values="Logout" />
         </div>
       </Section>
-      <ResponsiveNav state={navbarState} className={navbarState ? "show" : ""}>
+      <ResponsiveNav navstate={navbarState.toString()} className={navbarState ? "show" : ""}>
         <div className="responsive__links">
           <ul>
             <li className={currentLink === 1 ? "active" : "none"} onClick={() => setCurrentLink(1)} >
@@ -99,31 +115,31 @@ export default function Sidebar() {
               </a>
             </li>
             <li className={currentLink === 3 ? "active" : "none"} onClick={() => setCurrentLink(3)} >
-              <a onClick={() => { navigate('/admin/reported-question-manage') }}>
-                <div> <FaAddressCard style={{ width: "20px" }} /></div>
+              <a onClick={() => { navigate('/admin/question-manage') }}>
+                <div> <FaAddressCard style={{ width: "25px" }} /></div>
                 <span className="buttonsDashboard" > Questions</span>
               </a>
             </li>
             <li className={currentLink === 4 ? "active" : "none"} onClick={() => setCurrentLink(4)} >
-              <a onClick={() => { navigate("/admin/admin-community") }}>
-                <div><GiTwirlCenter style={{ width: "20px" }} /></div>
-                <span> Community</span>
-              </a>
-            </li>
-            <li className={currentLink === 5 ? "active" : "none"} onClick={() => setCurrentLink(5)} >
-              <a onClick={() => { navigate("/admin/tag-manage") }}>
-                <div><AiOutlineTag style={{ width: "25px" }} /></div>
-                <span className="buttonsDashboard" > Tags</span>
-              </a>
-            </li>
-            <li className={currentLink === 6 ? "active" : "none"} onClick={() => setCurrentLink(6)} >
-              <a nClick={() => { navigate('/admin/reported-question-manage') }}>
-                <div> <FaAddressCard style={{ width: "25px" }} /></div>
+              <a onClick={() => { navigate('/admin/reported-question-manage') }}>
+                <div> <FaAddressCard style={{ width: "20px" }} /></div>
                 <span className="buttonsDashboard" > Reported Questions</span>
               </a>
             </li>
+            <li className={currentLink === 5 ? "active" : "none"} onClick={() => setCurrentLink(5)} >
+              <a onClick={() => { navigate("/admin/reported-answer-manage") }}>
+                <div><GiTwirlCenter style={{ width: "20px" }} /></div>
+                <span> Reported Answers</span>
+              </a>
+            </li>
             <li className={currentLink === 6 ? "active" : "none"} onClick={() => setCurrentLink(6)} >
-              <a onClick={() => { navigate('/admin/reported-question-manage') }}>
+              <a onClick={() => { navigate("/admin/reported-comments-manage") }}>
+                <div><AiOutlineTag style={{ width: "25px" }} /></div>
+                <span className="buttonsDashboard" > Reported Comments</span>
+              </a>
+            </li>
+            <li className={currentLink === 7 ? "active" : "none"} onClick={() => setCurrentLink(7)} >
+              <a onClick={() => { navigate('/admin/logout') }}>
                 <div> <RiLogoutCircleRLine style={{ width: "25px", color: "white", cursor: "pointer" }} /></div>
                 <span onClick={handleLogout} className="buttonsDashboard" > Logout</span>
               </a>
@@ -131,6 +147,7 @@ export default function Sidebar() {
           </ul>
         </div>
       </ResponsiveNav>
+
     </>
   );
 }
@@ -184,7 +201,6 @@ const Section = styled.section`
         flex-direction: column;
         gap: 1rem;
         li {
-          padding: 0.6rem 1rem;
           border-radius: 0.6rem;
           &:hover {
             background-color: #ffc107;
@@ -193,8 +209,10 @@ const Section = styled.section`
             }
           }
           a {
+            padding: 0.6rem 1rem;
             text-decoration: none;
             display: flex;
+            align-items: center;
             gap: 1rem;
             color: white;
           }
@@ -260,7 +278,7 @@ const ResponsiveNav = styled.div`
   z-index: 10;
   background-color: black;
   height: 100vh;
-  width: ${({ state }) => (state ? "60%" : "0%")};
+  width: ${({ navstate }) => (navstate ? "60%" : "0%").toString()};
   transition: 0.4s ease-in-out;
   display: flex;
   opacity: 0;
@@ -274,7 +292,6 @@ const ResponsiveNav = styled.div`
       gap: 1rem;
       margin-top: 3rem;
       li {
-        padding: 0.6rem 1rem;
         border-radius: 0.6rem;
         &:hover {
           background-color: #ffc107;
@@ -283,8 +300,10 @@ const ResponsiveNav = styled.div`
           }
         }
         a {
+          padding: 0.6rem 1rem;
           text-decoration: none;
           display: flex;
+          align-items: center;
           gap: 1rem;
           color: white;
         }
