@@ -9,7 +9,7 @@ const questionsDataGet = async (req, res) => {
         console.log('req.query.limit', req.query.limit);
         const { requestPage, requestLimit } = req.query;
         const page = parseInt(requestPage, 10) || 0;
-        const limit = parseInt(requestLimit, 10) || 10;
+        const limit = parseInt(requestLimit, 10) || 100;
         console.log('page =>', page, '\n', 'limit =>', limit);
 
         const questionsData = await questionData.aggregate([

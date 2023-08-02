@@ -5,23 +5,40 @@ import Navbar from "./Navbar";
 import scrollreveal from "scrollreveal";
 import { useDispatch } from "react-redux";
 import { getAdminData } from "../../../redux/features/admin/adminDataSlice"
-import BarChart from "../Chart/BarChart";
-import { UserData } from "../Chart/Data";
-import LineChart from "../Chart/LineChart";
-import PieChart from "../Chart/PieChart";
+import SimpleLineChart from "../Chart/SimpleLineChart";
+import axios from "../../../api/axios";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
+  const [days, setDays] = useState(7);
+  const [data, setData] = useState([]);
   dispatch(getAdminData());
-  const [userData, setUserData] = useState({
-    labels: UserData.map((data) => data.year),
-    datasets: [{
-      label: "Users Gained",
-      data: UserData.map((data) => data.userGain),
-      backgroundColor: ['black', 'gray', 'red', 'blue',]
-    }]
-  })
 
+  useEffect(() => {
+    console.log('useEffect');
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('admin');
+        if (!token) {
+          dispatch(getAdminData());
+        } else {
+          console.log(token, 'to000ekn');
+          const res = (await axios.get("/admin/trending-data", {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+            withCredentials: true,
+          }));
+          console.log(res.data.data, 'res.data.data');
+          setData(res.data.data)
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, [])
 
   useEffect(() => {
     const sr = scrollreveal({
@@ -50,16 +67,34 @@ export default function Dashboard() {
         <div className="grid">
           <div className="row__one">
             <Analytics />
-            <div className="text-white border w-[800px] bg-red-200">
-              <h1 className="text-2xl">Chart & Graph</h1>
-              <BarChart chartData={userData}/>
-              <LineChart chartData={userData}/>
-              <PieChart chartData={userData}/>
+            <div className="flex mt-14 items-center gap-12">
+              <div className="w-[920px] flex justify-center items-center">
+                <div className="absolute z-10 left-[845px] text-white flex flex-col gap-10 ml-auto">
+                  <button className={`${days == 7 ? 'bg-[#ffc107] text-black' : 'bg-[#000000] hover:bg-[#ffc107] hover:text-black'} py-1 px-1.5 rounded-md font-medium`} onClick={() => setDays(7)}>7</button>
+                  <button className={`${days == 10 ? 'bg-[#ffc107] text-black' : 'bg-[#000000] hover:bg-[#ffc107] hover:text-black'} py-1 px-1.5 rounded-md font-medium`} onClick={() => setDays(10)}>10</button>
+                  <button className={`${days == 30 ? 'bg-[#ffc107] text-black' : 'bg-[#000000] hover:bg-[#ffc107] hover:text-black'} py-1 px-1.5 rounded-md font-medium`} onClick={() => setDays(30)}>30</button>
+                  <button className={`${days == 60 ? 'bg-[#ffc107] text-black' : 'bg-[#000000] hover:bg-[#ffc107] hover:text-black'} py-1 px-1.5 rounded-md font-medium`} onClick={() => setDays(60)}>60</button>
+                </div>
+                <div className="relative z-0">
+                  <SimpleLineChart days={days} />
+                </div>
+              </div>
+              <div className="w-[500px] h-[535px] text-white">
+                <h1 className="text-3xl text-center my-5">Trending</h1>
+                <div className="bg-gray-800 text-xl p-5 gap-10 flex flex-col">
+                  <ul>Question</ul>
+                  <ul>Question</ul>
+                  <ul>Question</ul>
+                  <ul>Question</ul>
+                  <ul>Question</ul>
+                  <ul>Question</ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </Section>
-    </div>
+      </Section >
+    </div >
   );
 }
 

@@ -7,7 +7,9 @@ const questionController = require('../controllers/adminControllers/questionCont
 const userController = require('../controllers/adminControllers/userController');
 
 router.get('/admin-data', adminAuth, adminController.adminDataGet); //Get admin data from jwt token
-router.get('/documents-count', adminAuth, adminController.documentsCountGet)
+router.get('/documents-count', adminAuth, adminController.documentsCountGet);
+router.get('/statistics-data', adminAuth, adminController.statisticsDataGet);
+router.get('/trending-data', adminAuth, adminController.trendingDataGet)
 
 router.post('/signin', signinController.adminSignin);
 
