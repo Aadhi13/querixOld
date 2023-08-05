@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const userData = require("../../models/user/userModel");
 const questionData = require("../../models/user/questionModel");
 const answerData = require("../../models/user/answerModel");
+const reportedQuestionData = require("../../models/user/reportedQuestionModel");
 const ObjectId = mongoose.Types.ObjectId
 
 const addQuestion = async (req, res) => {
@@ -53,7 +54,7 @@ const questionDataGet = async (req, res) => {
             } else {
                 return res.status(404).json({ message: 'Invalid question' });
             }
-        } catch(err) {
+        } catch (err) {
             return res.status(404).json({ message: 'Invalid question' });
         }
     } catch (err) {
@@ -122,7 +123,7 @@ const questionVote = async (req, res) => {
     } catch (err) {
         console.log(err.message);
     }
-}
+};
 
 const questionSave = async (req, res) => {
     try {
@@ -139,8 +140,41 @@ const questionSave = async (req, res) => {
     } catch (err) {
         return res.status(500).json({ message: "Internal server error." })
     }
-}
+};
 
+const reportQuestion = async (req, res) => {
+    try {
+        const { questionId } = req.body;
+        const userId = req.userId;
+        const questionDetails = await questionData.findById({ _id: questionId });
+        if (!questionDetails) {
+            return res.status(401).json({message: 'Invalid question.'});
+        } else {
+            const reportedQuestionDetails = await reportedQuestionData.findOne({ question: questionId });
+            if (reportedQuestionDetails) {
+                const isUserReported = reportedQuestionDetails.reportedBy.some((reportedBy) => reportedBy.userId.toString() === userId.toString());
+                if (isUserReported) {
+                    return res.status(409).json({ message: 'Question is already reported by this user.' });
+                } else {
+                    reportedQuestionDetails.reportedBy.push({ userId, reason: req.body.reason });
+                    await reportedQuestionDetails.save();
+                    return res.status(200).json({ message: 'Question successfully reported.' });
+                }
+            } else {
+                const newReportedQuestion = new reportedQuestionData({
+                    author: questionDetails.userId,  //Author of the question not the user reporting
+                    question: questionId,
+                    reportedBy: [{ userId, reason: req.body.reason }],
+                });
+                await newReportedQuestion.save();
+                return res.status(200).json({ message: 'Question successfully reported.' });
+            }
+        }
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+};
 
 module.exports = {
     addQuestion,
@@ -148,4 +182,5 @@ module.exports = {
     questionDataGet,
     questionVote,
     questionSave,
+    reportQuestion,
 };

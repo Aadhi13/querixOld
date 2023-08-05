@@ -5,6 +5,7 @@ import styled from "styled-components";
 import scrollreveal from "scrollreveal";
 import { BiTrashAlt } from 'react-icons/bi'
 import BasicTable from "../Table/BasicTable";
+import { Public, PublicOff } from "../../../assets/icons/Icons";
 
 
 function QuestionManage() {
@@ -153,7 +154,7 @@ function QuestionManage() {
       )
     },
     {
-      header: "User Name",
+      header: "Author",
       accessorKey: "author",
       cell: (props) => props.getValue().userName,
     },
@@ -196,50 +197,16 @@ function QuestionManage() {
       accessorFn: row => `${row.blockStatus ? 'Unblock' : 'Block'}`,
       cell: (props) => (
         <button
-          className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-24 py-2 rounded-lg`}
+          className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-28 py-2 rounded-lg`}
           onClick={() => {
             console.log('clicked', props.row.original._id);
             handleQuestionAction(props.row.original._id, props.row.original.author.userName, props.getValue().toLowerCase())
           }}>
-          {props.getValue()}
+          <div className="flex items-center justify-evenly">{props.getValue()}<span>{props.getValue() == 'Block' ? <PublicOff /> : <Public />}</span></div>
         </button>
       ),
     },
   ];
-
-
-
-
-  //question deleting and geting from database and updating the redux
-  // const questionDelete = async (qid) => {
-  //   try {
-  //     swal({
-  //       title: "Are you sure?",
-  //       text: "are you sure you want to delete this question?",
-  //       icon: "warning",
-  //       buttons: true,
-  //       dangerMode: true,
-  //     })
-  //       .then((deleteQuestionS) => {
-  //         if (deleteQuestionS) {
-  //           deleteQuestion(qid, adminDetails).then(async (res) => {
-  //             const response = await getQuestions(adminDetails)
-  //             dispatch(setAdminQuestionDetails(response))
-
-  //           })
-  //           swal("Question deleted successfully !", {
-  //             icon: "success",
-  //           });
-  //         } else {
-  //           swal("Canceled");
-  //         }
-  //       });
-
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
-
 
 
   useEffect(() => {

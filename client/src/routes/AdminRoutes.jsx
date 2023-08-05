@@ -7,7 +7,8 @@ import Dashboard from "../pages/admin/AdminDashboardPage";
 import IsAuthenticated from "../utils/admin/IsAuthenticated";
 import UserManage from "../pages/admin/AdminUserManagePage";
 import QuestionManage from "../pages/admin/AdminQuestionManagePage";
-
+import ReportedQuestionManage from "../pages/admin/AdminReportedQuestionManagePage";
+import ReportedAnswerManage from "../pages/admin/AdminReportedAnswerManagePage";
 
 function AdminRoutes() {
   return (
@@ -17,6 +18,8 @@ function AdminRoutes() {
         <Route path="signin" element={<IsAuthenticated><Signin /></IsAuthenticated>} />
         <Route path="user-manage" element={<IsAuthenticated><UserManage /></IsAuthenticated>} />
         <Route path="question-manage" element={<IsAuthenticated><QuestionManage /></IsAuthenticated>} />
+        <Route path="reported-question-manage" element={<IsAuthenticated><ReportedQuestionManage /></IsAuthenticated>} />
+        <Route path="reported-answer-manage" element={<IsAuthenticated><ReportedAnswerManage /></IsAuthenticated>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

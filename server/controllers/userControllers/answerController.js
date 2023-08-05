@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const userData = require("../../models/user/userModel");
 const questionData = require("../../models/user/questionModel");
 const answerData = require("../../models/user/answerModel");
+const reportedAnswerData = require("../../models/user/reportedAnswerModel");
 const ObjectId = mongoose.Types.ObjectId
 
 const addAnswer = async (req, res) => {
@@ -129,9 +130,44 @@ const answerVote = async (req, res) => {
     }
 }
 
+const reportAnswer = async (req, res) => {
+    try {
+        const { answerId } = req.body;
+        const userId = req.userId;
+        const answerDetails = await answerData.findById({ _id: answerId });
+        if (!answerDetails) {
+            return res.status(401).json({message: 'Invalid answer.'});
+        } else {
+            const reportedAnswerDetails = await reportedAnswerData.findOne({ answer: answerId });
+            if (reportedAnswerDetails) {
+                const isUserReported = reportedAnswerDetails.reportedBy.some((reportedBy) => reportedBy.userId.toString() === userId.toString());
+                if (isUserReported) {
+                    return res.status(409).json({ message: 'Answer is already reported by this user.' });
+                } else {
+                    reportedAnswerDetails.reportedBy.push({ userId, reason: req.body.reason });
+                    await reportedAnswerDetails.save();
+                    return res.status(200).json({ message: 'Answer successfully reported.' });
+                }
+            } else {
+                const newReportedAnswer = new reportedAnswerData({
+                    author: answerDetails.author,  //Author of the answer not the user reporting
+                    answer: answerId,
+                    reportedBy: [{ userId, reason: req.body.reason }],
+                });
+                await newReportedAnswer.save();
+                return res.status(200).json({ message: 'Answer successfully reported.' });
+            }
+        }
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
 module.exports = {
     addAnswer,
     answersDataGet,
     answerSave,
-    answerVote
+    answerVote,
+    reportAnswer
 };

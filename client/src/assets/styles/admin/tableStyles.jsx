@@ -9,7 +9,7 @@ export const TableContainer = styled.div`
   border: 1px solid #3a3939;
   border-radius: 8px;
   overflow: auto;
-  height: 86vh;
+  height: 83vh;
   `;
 
 export const StyledTable = styled.table`

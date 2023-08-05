@@ -9,6 +9,7 @@ import Navbar from "../Dashboard/Navbar";
 import BasicTable from '../Table/BasicTable';
 import axios from '../../../api/axios';
 import swal from 'sweetalert';
+import { Public, PublicOff } from '../../../assets/icons/Icons';
 
 
 export default function UserManage() {
@@ -155,12 +156,12 @@ export default function UserManage() {
             accessorFn: row => `${row.blockStatus ? 'Unblock' : 'Block'}`,
             cell: (props) => (
                 <button
-                    className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-24 py-2 rounded-lg`}
+                    className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-28 py-2 rounded-lg`}
                     onClick={() => {
                         console.log('clicked', props.row.original._id);
                         handleUserAction(props.row.original._id, props.row.original.userName, props.getValue().toLowerCase())
                     }}>
-                    {props.getValue()}
+                    <div className="flex items-center justify-evenly">{props.getValue()}<span>{props.getValue() == 'Block' ? <PublicOff /> : <Public />}</span></div>
                 </button>
             ),
         },
@@ -263,7 +264,7 @@ export default function UserManage() {
                 <Navbar />
                 <div className="grid">
                     <div className="row__one">
-                        <BasicTable data={data} columns={columns} title={'Users Details'} tableFor={'userManage'}/>
+                        <BasicTable data={data} columns={columns} title={'Users Details'} tableFor={'userManage'} />
                     </div>
                 </div>
             </Section>

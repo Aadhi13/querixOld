@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
-const reportedQuestionSchema = new mongoose.Schema({
+const reportedAnswerSchema = new mongoose.Schema({
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
     },
-    question: {
+    answer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'answers',
     },
     reportedBy: [{
         userId: {
@@ -24,4 +24,4 @@ const reportedQuestionSchema = new mongoose.Schema({
     { timestamps: true }
 );
 
-module.exports = mongoose.model("reportedQuestions", reportedQuestionSchema);
+module.exports = mongoose.model("reportedAnswers", reportedAnswerSchema);

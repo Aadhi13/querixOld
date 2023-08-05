@@ -35,4 +35,8 @@ router.put('/answer-vote', userAuth, answerController.answerVote); //To vote(upV
 router.post('/add-comment', userAuth, commentController.addComment);
 router.get('/comments-data', commentController.commentsDataGet);
 
+router.post('/report-question', userAuth, questionController.reportQuestion); //To report question.
+
+router.post('/report-answer', userAuth, answerController.reportAnswer); //To report answer.
+
 module.exports = router;

@@ -17,7 +17,7 @@ export default function BasicTable(props) {
   const { data, columns, title, tableFor } = props;
 
   const customShadow = {
-    //right  left up bottom
+    //right left up bottom
     textShadow:
       "0.5px 0.5px 0 black, -0.5px -0.5px 0 red, 0.5px -0.5px 0 black, -0.5px 0.5px 0 red",
   };

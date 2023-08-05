@@ -6,7 +6,7 @@ import axios from "../../../api/axios";
 import { useSelector, useDispatch } from 'react-redux';
 import { getUserData, logout } from '../../../redux/features/user/userDataSlice';
 import { menuHide } from '../../../redux/features/user/menuSlice';
-import SpinningWheel, { DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
+import { SpinningWheel, DownVote, DropDown, Media, UpVote } from '../../../assets/icons/Icons';
 import QuestionHome from './QuestionHome';
 import { MdWidthFull } from 'react-icons/md';
 
