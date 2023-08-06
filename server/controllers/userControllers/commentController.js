@@ -3,6 +3,7 @@ const userData = require("../../models/user/userModel");
 const questionData = require("../../models/user/questionModel");
 const answerData = require("../../models/user/answerModel");
 const commentData = require("../../models/user/commentModel");
+const reportedCommentData = require("../../models/user/reportedCommentModel")
 const ObjectId = mongoose.Types.ObjectId
 
 const addComment = async (req, res) => {
@@ -38,22 +39,58 @@ const commentsDataGet = async (req, res) => {
         const perPage = 4;
         const skipCount = perPage * page;
         const question = await questionData.findById(questionId).select('comments');
+        const blockedCommentsCount = await answerData.countDocuments({ _id: { $in: question.comments }, blockStatus: true });
         const commentsData = await commentData
-            .find({ _id: { $in: question.comments } })
+            .find({ _id: { $in: question.comments }, blockStatus: false })
             .skip(skipCount)
             .limit(perPage)
             .populate('author', 'userName name')
             .sort({ _id: -1 });
-        const commentsCount = question.comments.length;
+        const commentsCount = question.comments.length - blockedCommentsCount;
         return res.status(200).json({ message: 'Comments data sent', commentsData, commentsCount });
     } catch (err) {
         console.log(err.message);
     }
 }
 
+const reportComment = async (req, res) => {
+    try {
+        const { commentId } = req.body;
+        const userId = req.userId;
+        const commentDetails = await commentData.findById({ _id: commentId });
+        if (!commentDetails) {
+            return res.status(401).json({ message: 'Invalid comment.' });
+        } else {
+            const reportedCommentDetails = await reportedCommentData.findOne({ comment: commentId });
+            if (reportedCommentDetails) {
+                const isUserReported = reportedCommentDetails.reportedBy.some((reportedBy) => reportedBy.userId.toString() === userId.toString());
+                if (isUserReported) {
+                    return res.status(409).json({ message: 'Comment is already reported by this user.' });
+                } else {
+                    reportedCommentDetails.reportedBy.push({ userId, reason: req.body.reason });
+                    await reportedCommentDetails.save();
+                    return res.status(200).json({ message: 'Comment successfully reported.' });
+                }
+            } else {
+                const newReportedComment = new reportedCommentData({
+                    author: commentDetails.author,  //Author of the comment not the user reporting
+                    comment: commentId,
+                    reportedBy: [{ userId, reason: req.body.reason }],
+                });
+                await newReportedComment.save();
+                return res.status(200).json({ message: 'Comment successfully reported.' });
+            }
+        }
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
 
 
 module.exports = {
     addComment,
-    commentsDataGet
+    commentsDataGet,
+    reportComment,
 };

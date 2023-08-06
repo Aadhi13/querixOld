@@ -36,6 +36,10 @@ const commentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "comments"
     }],
+    blockStatus: {
+        type: Boolean,
+        default: false
+    },
 },
     { timestamps: true }
 );

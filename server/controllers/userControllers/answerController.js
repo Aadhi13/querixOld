@@ -38,13 +38,14 @@ const answersDataGet = async (req, res) => {
         const perPage = 4;
         const skipCount = perPage * page;
         const question = await questionData.findById(questionId).select('answers');
+        const blockedAnswersCount = await answerData.countDocuments({ _id: { $in: question.answers }, blockStatus: true });
         const answersData = await answerData
-            .find({ _id: { $in: question.answers } })
+            .find({ _id: { $in: question.answers }, blockStatus: false })
             .skip(skipCount)
             .limit(perPage)
             .populate('author', 'userName name')
             .sort({ _id: -1 });
-        const answersCount = question.answers.length;
+        const answersCount = question.answers.length - blockedAnswersCount;
         return res.status(200).json({ message: 'Answers data sent', answersData, answersCount });
     } catch (err) {
         console.log(err.message);
@@ -136,10 +137,13 @@ const reportAnswer = async (req, res) => {
         const userId = req.userId;
         const answerDetails = await answerData.findById({ _id: answerId });
         if (!answerDetails) {
-            return res.status(401).json({message: 'Invalid answer.'});
+            return res.status(401).json({ message: 'Invalid answer.' });
         } else {
+            console.log('1');
             const reportedAnswerDetails = await reportedAnswerData.findOne({ answer: answerId });
+            console.log('2');
             if (reportedAnswerDetails) {
+                console.log('3');
                 const isUserReported = reportedAnswerDetails.reportedBy.some((reportedBy) => reportedBy.userId.toString() === userId.toString());
                 if (isUserReported) {
                     return res.status(409).json({ message: 'Answer is already reported by this user.' });

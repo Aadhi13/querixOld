@@ -87,7 +87,7 @@ export default function Sidebar(props) {
                 </a>
               </li>
               <li className={currentLink === 6 ? "active" : "none"} onClick={() => setCurrentLink(6)} >
-                <a onClick={() => { navigate('/admin/reported-comments-manage') }}>
+                <a onClick={() => { navigate('/admin/reported-comment-manage') }}>
                   <div> <BsFillChatTextFill style={{ width: "25px" }} /></div>
                   <span className="buttonsDashboard" > Reported Comments</span>
                 </a>
@@ -133,7 +133,7 @@ export default function Sidebar(props) {
               </a>
             </li>
             <li className={currentLink === 6 ? "active" : "none"} onClick={() => setCurrentLink(6)} >
-              <a onClick={() => { navigate("/admin/reported-comments-manage") }}>
+              <a onClick={() => { navigate("/admin/reported-comment-manage") }}>
                 <div><AiOutlineTag style={{ width: "25px" }} /></div>
                 <span className="buttonsDashboard" > Reported Comments</span>
               </a>

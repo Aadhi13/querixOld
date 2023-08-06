@@ -36,7 +36,7 @@ router.post('/add-comment', userAuth, commentController.addComment);
 router.get('/comments-data', commentController.commentsDataGet);
 
 router.post('/report-question', userAuth, questionController.reportQuestion); //To report question.
-
 router.post('/report-answer', userAuth, answerController.reportAnswer); //To report answer.
+router.post('/report-comment', userAuth, commentController.reportComment); //To report comment.
 
 module.exports = router;

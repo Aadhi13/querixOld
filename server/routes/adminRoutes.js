@@ -6,6 +6,7 @@ const adminController = require('../controllers/adminControllers/adminController
 const questionController = require('../controllers/adminControllers/questionController');
 const userController = require('../controllers/adminControllers/userController');
 const answerController = require('../controllers/adminControllers/answerController');
+const commentController = require('../controllers/adminControllers/commentController');
 
 router.get('/admin-data', adminAuth, adminController.adminDataGet); //Get admin data from jwt token
 router.get('/documents-count', adminAuth, adminController.documentsCountGet);
@@ -25,11 +26,16 @@ router.put('/unblock-user/:userId', adminAuth, userController.userUnBlock);
 router.put('/block-answer/:answerId', adminAuth, answerController.answerBlock);
 router.put('/unblock-answer/:answerId', adminAuth, answerController.answerUnBlock);
 
+router.put('/block-comment/:commentId', adminAuth, commentController.commentBlock);
+router.put('/unblock-comment/:commentId', adminAuth, commentController.commentUnBlock);
+
 router.get('/reported-questions-data', adminAuth, questionController.reportedQuestionsDataGet);
 router.get('/reported-question-reasons', adminAuth, questionController.reportedQuestionReasonsDataGet);
 
 router.get('/reported-answers-data', adminAuth, answerController.reportedAnswersDataGet);
 router.get('/reported-answer-reasons', adminAuth, answerController.reportedAnswerReasonsDataGet);
 
+router.get('/reported-comments-data', adminAuth, commentController.reportedCommentsDataGet);
+router.get('/reported-comment-reasons', adminAuth, commentController.reportedCommentReasonsDataGet);
 
 module.exports = router;

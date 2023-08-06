@@ -9,10 +9,10 @@ import { Block, Close, FactCheck, Open, Pending, Public, PublicOff } from "../..
 import { message } from "antd";
 
 
-export default function ReportedAnswerManage() {
+export default function ReportedCommentManage() {
 
-    const [reportedAnswers, setReportedAnswers] = useState([]);
-    const [reportedAnswerReasons, setReportedAnswerReasons] = useState([]);
+    const [reportedComments, setReportedComments] = useState([]);
+    const [reportedCommentReasons, setReportedCommentReasons] = useState([]);
     const [modalData, setModalData] = useState();
 
     const formattedDate = new Intl.DateTimeFormat('en-GB', {
@@ -25,7 +25,7 @@ export default function ReportedAnswerManage() {
     });
 
 
-    //get all reported answers and update the reportedAnswers state
+    //get all reported Comments and update the reportedComments state
     useEffect(() => {
         try {
             const token = localStorage.getItem("admin");
@@ -33,7 +33,7 @@ export default function ReportedAnswerManage() {
                 localStorage.removeItem('admin');
                 navigate('/admin/signin');
             };
-            axios.get("/admin/reported-answers-data", {
+            axios.get("/admin/reported-comments-data", {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: token,
@@ -41,7 +41,7 @@ export default function ReportedAnswerManage() {
                 withCredentials: true,
             }).then((res) => {
                 console.log('res', res.data);
-                setReportedAnswers(res.data.reportedAnswersData);
+                setReportedComments(res.data.reportedCommentsData);
             });
         } catch (err) {
             if (!err?.res) {
@@ -58,15 +58,15 @@ export default function ReportedAnswerManage() {
     }, []);
 
     useEffect(() => {
-        console.log('Reported answers ', reportedAnswers);
-    }, [reportedAnswers])
+        console.log('Reported comments ', reportedComments);
+    }, [reportedComments])
 
-    const data = useMemo(() => reportedAnswers, [reportedAnswers]);
+    const data = useMemo(() => reportedComments, [reportedComments]);
 
 
-    //blocking & unblocking reported answers 
-    const handleAnswerAction = async (answerId, userName, action) => {
-        console.log('questionId => ', answerId, '\nuserName => ', userName, '\naction => ', action);
+    //blocking & unblocking reported comments 
+    const handleCommentAction = async (commentId, userName, action) => {
+        console.log('questionId => ', commentId, '\nuserName => ', userName, '\naction => ', action);
         try {
             const token = localStorage.getItem("admin");
             if (!token) {
@@ -76,7 +76,7 @@ export default function ReportedAnswerManage() {
             }
 
             const wrapper = document.createElement('div');
-            wrapper.innerHTML = `Are you sure you want to ${action} this answer by <span style="font-weight: 500;">${userName}</span>?`;
+            wrapper.innerHTML = `Are you sure you want to ${action} this comment by <span style="font-weight: 500;">${userName}</span>?`;
 
             const userAction = await swal({
                 title: "Are you sure?",
@@ -87,7 +87,7 @@ export default function ReportedAnswerManage() {
             });
 
             if (userAction) {
-                const response = await axios.put(`/admin/${action}-answer/` + answerId, {}, {
+                const response = await axios.put(`/admin/${action}-comment/` + commentId, {}, {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: token,
@@ -96,11 +96,11 @@ export default function ReportedAnswerManage() {
                 });
 
                 if (response.data.success) {
-                    swal(`Answer by ${userName} ${action}ed!`, {
+                    swal(`Comment by ${userName} ${action}ed!`, {
                         icon: "success",
                     });
 
-                    const answersResponse = await axios.get("/admin/reported-answers-data", {
+                    const commentsResponse = await axios.get("/admin/reported-comments-data", {
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: token,
@@ -108,16 +108,16 @@ export default function ReportedAnswerManage() {
                         withCredentials: true,
                     });
 
-                    setReportedAnswers(answersResponse.data.reportedAnswersData);
+                    setReportedComments(commentsResponse.data.reportedCommentsData);
                 } else {
-                    swal(`Error occurred. Answer by ${userName} didn't ${action}ed!`, {
+                    swal(`Error occurred. Comment by ${userName} didn't ${action}ed!`, {
                         icon: "error",
                     });
                 }
             } else {
 
                 const wrapper2 = document.createElement('div');
-                wrapper2.innerHTML = `${action}ing answer of <span style="font-weight: 500;">${userName}</span> has been cancelled.`;
+                wrapper2.innerHTML = `${action}ing comment of <span style="font-weight: 500;">${userName}</span> has been cancelled.`;
 
                 swal({
                     title: `${action}ing Cancelled`,
@@ -129,7 +129,7 @@ export default function ReportedAnswerManage() {
         } catch (error) {
             console.log("Error in catch ", error);
             const wrapper3 = document.createElement('div');
-            wrapper3.innerHTML = `An unknown error occurred. Answer by <span style="font-weight: 500;">${userName}</span> didn't <span style="font-weight: 500;">${action}ed</span>!`;
+            wrapper3.innerHTML = `An unknown error occurred. Comment by <span style="font-weight: 500;">${userName}</span> didn't <span style="font-weight: 500;">${action}ed</span>!`;
             swal({
                 title: "Error",
                 content: wrapper3,
@@ -158,15 +158,15 @@ export default function ReportedAnswerManage() {
     //Handle view button
     const handleViewReasons = (details) => {
         try {
-            //Make a request to get the reasons take answer id from details.id
-            setReportedAnswerReasons([]);
+            //Make a request to get the reasons take comment id from details.id
+            setReportedCommentReasons([]);
             const token = localStorage.getItem("admin");
             if (!token) {
                 localStorage.removeItem('admin');
                 navigate('/admin/signin');
             };
-            axios.get("/admin/reported-answer-reasons", {
-                params: { reportedAnswerId: details.id },
+            axios.get("/admin/reported-comment-reasons", {
+                params: { reportedCommentId: details.id },
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: token,
@@ -174,7 +174,7 @@ export default function ReportedAnswerManage() {
                 withCredentials: true,
             }).then((res) => {
                 setModalData(details);
-                setReportedAnswerReasons(res.data.reportedAnswerReasonsData);
+                setReportedCommentReasons(res.data.reportedCommentReasonsData);
             });
         } catch (err) {
             if (!err?.res) {
@@ -184,8 +184,8 @@ export default function ReportedAnswerManage() {
             } else if (err.response.data.message == "Invalid jwt token." || err.response.data.message == "Jwt expired." || err.response.data.message == "No jwt token.") {
                 localStorage.removeItem("admin");
                 navigate('/admin/signin');
-            } else if (err.response, data.message == "Invalid reported answer.") {
-                message.error("Can't get data. Invalid reported answer.");
+            } else if (err.response, data.message == "Invalid reported comment.") {
+                message.error("Can't get data. Invalid reported comment.");
             } else {
                 message.error('Something went wrong.')
             }
@@ -193,11 +193,11 @@ export default function ReportedAnswerManage() {
     };
 
     useEffect(() => {
-        if (reportedAnswerReasons.length > 0) {
+        if (reportedCommentReasons.length > 0) {
             console.log('modal is going to open ');
             openDialog();
         }
-    }, [reportedAnswerReasons]);
+    }, [reportedCommentReasons]);
 
     const columns = [
         {
@@ -206,11 +206,11 @@ export default function ReportedAnswerManage() {
             cell: (props) => props.row.index + 1,
         },
         {
-            header: "Answer",
-            accessorKey: "answer",
+            header: "Comment",
+            accessorKey: "Comment",
             cell: (props) => (
                 <>
-                    <div className="font-normal whitespace-nowrap overflow-ellipsis overflow-hidden">{props.getValue().body}</div>
+                    <div className="font-normal whitespace-nowrap overflow-ellipsis overflow-hidden">{props.row.original.comment.body}</div>
                 </>
             )
         },
@@ -218,11 +218,6 @@ export default function ReportedAnswerManage() {
             header: "Author",
             accessorKey: "author",
             cell: (props) => props.getValue().userName,
-        },
-        {
-            header: "Votes",
-            accessorKey: "votesCount",
-            cell: (props) => props.row.original.votesCount,
         },
         {
             header: "Reports",
@@ -258,14 +253,14 @@ export default function ReportedAnswerManage() {
                     <dialog id={`dialog`} className='top-[35dvh] xl:left-[35dvw] lg:left-[25dvw] md:left-[23dvw] sm:left-[20dvw] xs:left-[20dvw] left-[5dvw] rounded-lg focus:outline-0 border border-gray-500/75 backdrop:backdrop-blur-[4px] backdrop:bg-gray-400 backdrop:bg-opacity-20'>
                         <div className='bg-gray-100 xs:w-[400px] sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[650px] rounded-lg'>
                             <header className='bg-slate-200/50 flex flex-row justify-between items-center border-[0.5px] border-b-gray-400 px-7 py-4'>
-                                <div className='text-xl font-bold'>Resons for reporting <span className='text-blue-600'>@{modalData?.author}'s</span> answer</div>
+                                <div className='text-xl font-bold'>Resons for reporting <span className='text-blue-600'>@{modalData?.author}'s</span> Comment</div>
                                 <div className='px-1 py-1 hover:bg-red-300/60 flex justify-start w-fit rounded-lg -mr-2 cursor-pointer' onClick={closeDialog}>
                                     <div className='flex justify-center'><Close color="red" width="1.2em" height="1.2em" /></div>
                                 </div>
                             </header>
                             <div>
                                 <div className='flex flex-col gap-5 h-72 my-4'>
-                                    {reportedAnswerReasons.map((reason) => (
+                                    {reportedCommentReasons.map((reason) => (
                                         <div key={reason._id} className="bg-gray-300/50 rounded-lg shadow-md p-4 mx-4">
                                             <div className="text-lg font-semibold mb-2">Reason:</div>
                                             <p className="text-black mb-4 pl-2">{reason.reason}</p>
@@ -303,8 +298,8 @@ export default function ReportedAnswerManage() {
                 <button
                     className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-28 py-2 rounded-lg`}
                     onClick={() => {
-                        console.log('clicked actions: ', props.row.original.answer._id);
-                        handleAnswerAction(props.row.original.answer._id, props.row.original.author.userName, props.getValue().toLowerCase())
+                        console.log('clicked actions: ', props.row.original.comment._id);
+                        handleCommentAction(props.row.original.comment._id, props.row.original.author.userName, props.getValue().toLowerCase())
                     }}>
                     <div className="flex items-center justify-evenly">{props.getValue()}<span>{props.getValue() == 'Block' ? <PublicOff /> : <Public />}</span></div>
                 </button>
@@ -339,7 +334,7 @@ export default function ReportedAnswerManage() {
                 <Navbar />
                 <div className="grid">
                     <div className="row__one">
-                        <BasicTable data={data} columns={columns} title={'Reported Answers Details'} tableFor={'questionManage'} />
+                        <BasicTable data={data} columns={columns} title={'Reported Comments Details'} tableFor={'questionManage'} />
                     </div>
                 </div>
                 {/* <Toaster /> */}
