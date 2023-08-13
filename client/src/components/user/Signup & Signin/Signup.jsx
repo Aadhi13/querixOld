@@ -152,9 +152,9 @@ function Signup() {
 
   return (
     <>
-      <div className='items-center justify-center flex' style={{ height: '91vh' }}>
+      <div className='items-center justify-center flex' style={{ height: '86vh' }}>
         <div className="">
-          <div className="rounded-lg shadow-lg shadow-gray-300 bg-gray-100 w-90 h-auto">
+          <div className="rounded-lg shadow-sm shadow-gray-500 bg-gray-200 bg-opacity-90 w-90 h-auto">
             <div style={{ width: "362px" }} className="px-10 sm:p-6">
               <h1 className="text-3xl select-none font-semibold  font-roboto ">
                 Sign up
@@ -365,11 +365,11 @@ function Signup() {
               </div>
             </div>
           </div>
-          <div className="place-content-center">
-            <p className="items-center justify-center flex mt-8">
+          <div className="place-content-center bg-black bg-opacity-[60%] rounded-lg p-4 text-center mt-5">
+            <p className="text-white">
               Already have an account?&nbsp;
               <Link to="/signin">
-                <span className="text-linkedin font-semibold hover:bg-linkedin2 hover:bg-opacity-20 hover:rounded-full hover:underline px-2 py-1 cursor-pointer">
+                <span className="text-sky-500 font-semibold hover:bg-sky-700 hover:bg-opacity-20 rounded-full hover:underline px-2 py-1 cursor-pointer transition">
                   Sign in
                 </span>
               </Link>

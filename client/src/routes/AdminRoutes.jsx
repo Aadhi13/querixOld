@@ -9,6 +9,7 @@ import UserManage from "../pages/admin/AdminUserManagePage";
 import QuestionManage from "../pages/admin/AdminQuestionManagePage";
 import ReportedQuestionManage from "../pages/admin/AdminReportedQuestionManagePage";
 import ReportedAnswerManage from "../pages/admin/AdminReportedAnswerManagePage";
+import ReportedCommentManage from "../pages/admin/AdminReportedCommentManagePage";
 
 function AdminRoutes() {
   return (
@@ -20,6 +21,7 @@ function AdminRoutes() {
         <Route path="question-manage" element={<IsAuthenticated><QuestionManage /></IsAuthenticated>} />
         <Route path="reported-question-manage" element={<IsAuthenticated><ReportedQuestionManage /></IsAuthenticated>} />
         <Route path="reported-answer-manage" element={<IsAuthenticated><ReportedAnswerManage /></IsAuthenticated>} />
+        <Route path="reported-comment-manage" element={<IsAuthenticated><ReportedCommentManage /></IsAuthenticated>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

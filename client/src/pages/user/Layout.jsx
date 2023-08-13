@@ -8,7 +8,7 @@ function Layout() {
   return (
     <>
       {location.pathname !== '/signup' && location.pathname !== '/otp-verify' && location.pathname !== '/signin' && location.pathname !== '/forgot-password' && <Header />}
-      {(location.pathname == '/signup' || location.pathname == '/otp-verify' || location.pathname == '/signin' || location.pathname == '/forgot-password') && <HeaderMinimal />}
+      {(location.pathname == '/otp-verify' || location.pathname == '/forgot-password') && <HeaderMinimal />}
       <Outlet />
     </>
   )

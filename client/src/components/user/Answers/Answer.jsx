@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import Comment from '../Comment/Comment'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Close, DownVote, Flag, Save, Share, UpVote } from '../../../assets/icons/Icons'
+import { Close, DownVote, Flag, Save, Saved, Share, UpVote } from '../../../assets/icons/Icons'
 import axios from '../../../api/axios';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -12,10 +12,10 @@ const INPUT_REGEX = /[^\s\n]/;
 const Answer = forwardRef(function Answer(props, ref) {
 
     const location = useLocation()
-    const { answer, index, highliteAnswer } = props;
-    const [isReplaying, setIsReplaying] = useState(false)
+    const { answer, index, highliteAnswer, onUpdate } = props;
     const answerRef = useRef();
 
+    const [save, setSave] = useState(false);
     const [vote, setVote] = useState(0);
     const initialVoteCount = answer.votes && answer.votes.upVote.count - answer.votes.downVote.count;
     const [voteCount, setVoteCount] = useState(initialVoteCount);
@@ -50,6 +50,10 @@ const Answer = forwardRef(function Answer(props, ref) {
             setVoteCount(answer.votes.upVote.count - answer.votes.downVote.count)
             setVote(-1);
         }
+
+        if (userData?.savedAnswers?.includes(answer?._id)) {
+            setSave(true)
+        }
     }, [answer])
 
     //Below useEffect will handle the answer URL. By highliting the answer and scroll down to its place.
@@ -80,6 +84,11 @@ const Answer = forwardRef(function Answer(props, ref) {
                 position: toast.POSITION.TOP_CENTER,
                 autoClose: 2000
             });
+        } else if (type == 'noUserUnsave') {
+            toast.error('Please login to Unsave answer.', {
+                position: toast.POSITION.TOP_CENTER
+            });
+
         } else if (type == 'linkCopied') {
             toast.success('Link copied to clipboard.', {
                 position: toast.POSITION.TOP_CENTER,
@@ -109,6 +118,11 @@ const Answer = forwardRef(function Answer(props, ref) {
             toast.success('Answer successfully reported.', {
                 position: toast.POSITION.TOP_CENTER,
                 autoClose: 2000
+            });
+        } else if (type == 'answerUnsaveSuccess') {
+            toast.success('Asnwer unsaved.', {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 1000
             });
         } else if (type == 'warningReportAnswer') {
             toast.warning('Answer is already reported by this user.', {
@@ -252,6 +266,7 @@ const Answer = forwardRef(function Answer(props, ref) {
                 })
                 if (response.data.message == 'Answer successfully saved.') {
                     showToastMessage('answerSaveSuccess')
+                    setSave(true)
                 }
             } catch (err) {
                 if (!err?.response) {
@@ -260,6 +275,44 @@ const Answer = forwardRef(function Answer(props, ref) {
                     showToastMessage('errorNetwork')
                 } else if (err.response.data.message == 'User not found.') {
                     showToastMessage('noUserSave')
+                } else if (err.response.data.message == "Internal server error.") {
+                    showToastMessage('errorServer')
+                } else {
+                    showToastMessage('errorUnknown')
+                }
+
+            }
+        }
+    }
+
+
+    //Handle Unsave questoin
+
+    const handleUnsaveAnswer = async () => {
+        closeDialog();
+        const token = localStorage.getItem('user');
+        if (!token) {
+            return;
+        } else {
+            try {
+                const response = await axios.put("/answer-unsave", { answerId: answer._id }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token
+                    },
+                    withCredentials: true
+                })
+                if (response.data.message == 'Answer successfully unsaved.') {
+                    showToastMessage('answerUnsaveSuccess')
+                    setSave(false)
+                }
+            } catch (err) {
+                if (!err?.response) {
+                    showToastMessage('errorServer')
+                } else if (err.code === "ERR_NETWORK") {
+                    showToastMessage('errorNetwork')
+                } else if (err.response.data.message == 'User not found.') {
+                    showToastMessage('noUserUnsave')
                 } else if (err.response.data.message == "Internal server error.") {
                     showToastMessage('errorServer')
                 } else {
@@ -313,6 +366,9 @@ const Answer = forwardRef(function Answer(props, ref) {
             setRows(4);
         }
     };
+
+
+    //Handle reporting answers
 
     const handleReportSubmit = async () => {
         console.log('Report =>', answer);
@@ -454,16 +510,28 @@ const Answer = forwardRef(function Answer(props, ref) {
                             <div className='flex items-center ml-1 text-sm'>@{answer?.author?.userName}</div>
                         </div>
                         <div className='mt-4'>
-                            <div className='pr-1.5 mb-3'>
-                                {answer.answer}  {/* Root answer */}
+                            <div className='mb-1 ml-1'>
+                                <pre className='whitespace-pre-wrap font-sans'>
+                                    {answer.answer}  {/* Root answer */}
+                                </pre>
                             </div>
                             <div className='flex justify-start'>
-                                <div className='mr-2 flex justify-center items-center hover:bg-gray-300 hover:rounded-md p-1.5' onClick={handleSaveAnswer} >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                                    </svg>
-                                    <button className='ml-1 text-sm font-medium '>Save</button>
-                                </div>
+                                {save ?
+                                    <div className='mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5 cursor-pointer text-green-700' onClick={handleUnsaveAnswer}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                                            <path fillRule="evenodd" d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 01-1.085.67L12 18.089l-7.165 3.583A.75.75 0 013.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93z" clipRule="evenodd" />
+                                        </svg>
+
+                                        <button className='ml-1 text-sm font-medium '>Saved</button>
+                                    </div>
+                                    :
+                                    <div className='mr-2 flex justify-center items-center hover:bg-gray-300 hover:rounded-md p-1.5 cursor-pointer' onClick={handleSaveAnswer}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                        </svg>
+                                        <button className='ml-1 text-sm font-medium '>Save</button>
+                                    </div>
+                                }
                                 <div className='mr-2 flex justify-center items-center hover:bg-gray-300 hover:rounded-md p-1.5' onClick={handleShareAnswer}>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className='w-5 h-5'>
                                         <path fill="currentColor" d="m237.66 106.35l-80-80A8 8 0 0 0 144 32v40.35c-25.94 2.22-54.59 14.92-78.16 34.91c-28.38 24.08-46.05 55.11-49.76 87.37a12 12 0 0 0 20.68 9.58c11-11.71 50.14-48.74 107.24-52V192a8 8 0 0 0 13.66 5.65l80-80a8 8 0 0 0 0-11.3ZM160 172.69V144a8 8 0 0 0-8-8c-28.08 0-55.43 7.33-81.29 21.8a196.17 196.17 0 0 0-36.57 26.52c5.8-23.84 20.42-46.51 42.05-64.86C99.41 99.77 127.75 88 152 88a8 8 0 0 0 8-8V51.32L220.69 112Z"></path>
@@ -482,9 +550,15 @@ const Answer = forwardRef(function Answer(props, ref) {
                                         <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={openDialog2}>
                                             <div className='px-1 mr-2 flex items-center justify-center'><Flag width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Report</div>
                                         </div>
-                                        <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={handleSaveAnswer}>
-                                            <div className='px-1 mr-2 flex items-center justify-center'><Save width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Save</div>
-                                        </div>
+                                        {save ?
+                                            <div className='px-2 py-1.5 hover:bg-gray-400/40 text-green-700 flex items-center justify-start' onClick={handleUnsaveAnswer}>
+                                                <div className='px-1 mr-2 flex items-center justify-center'><Saved width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Saved</div>
+                                            </div>
+                                            :
+                                            <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={handleSaveAnswer}>
+                                                <div className='px-1 mr-2 flex items-center justify-center'><Save width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Save</div>
+                                            </div>
+                                        }
                                         <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={handleShareAnswer}>
                                             <div className='px-1 mr-2 flex items-center justify-center'><Share width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Share</div>
                                         </div>

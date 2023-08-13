@@ -46,11 +46,13 @@ export default function MyComments() {
             <div className='text-2xl capitalize font-semibold pb-5'>My Comments</div>
             <div className='flex flex-col rounded-lg border h-fit p-3 gap-3'>                 {/* Comment */}
 
-
-                {data && data.map((comment) => (
-                    <Comment comment={comment} key={comment?._id} onUpdate={triggerFetchData} />
-                ))}
-
+                {data.length > 0 ? (
+                    data && data.map((comment) => (
+                        <Comment comment={comment} key={comment?._id} onUpdate={triggerFetchData} />
+                    ))
+                ) : (
+                    <div className='p-3 text-lg font-medium text-center'>No comments to display, comment some questions.</div>
+                )}
 
             </div>
         </div>

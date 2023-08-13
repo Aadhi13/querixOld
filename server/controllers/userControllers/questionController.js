@@ -27,21 +27,32 @@ const addQuestion = async (req, res) => {
     }
 };
 
+
 const questionsDataGet = async (req, res) => {
     try {
-        console.log('req.query.page', req.query.page)
+        console.log('req.query.page', req.query.page);
         const { page } = req.query;
-        const questionsData = await questionData.find({ blockStatus: { $ne: true } })
+
+        const blockedQuestionCount = await questionData.countDocuments({ blockStatus: true });
+        const totalQuestionCount = await questionData.countDocuments();
+
+        const questions = await questionData
+            .find({ blockStatus: { $ne: true } })
             .skip(4 * page)
             .limit(4)
             .populate('userId', 'userName name')
-            .sort({ _id: -1 })
-        const questionsCount = await questionData.countDocuments();
-        return res.status(200).json({ message: 'Questions data sended', questionsData, questionsCount });
+            .sort({ _id: -1 });
+
+        return res.status(200).json({
+            message: 'Questions data sent',
+            questions,
+            questionsCount: totalQuestionCount - blockedQuestionCount,
+        });
     } catch (err) {
         console.log(err.message);
     }
-}
+};
+
 
 const questionDataGet = async (req, res) => {
     try {
@@ -50,7 +61,11 @@ const questionDataGet = async (req, res) => {
         try {
             const singleQuestionData = await questionData.findById({ _id: new ObjectId(questionId) }).populate('userId', 'userName name')
             if (singleQuestionData) {
-                return res.status(200).json({ message: 'Question data sended', singleQuestionData });
+                if (singleQuestionData.blockStatus) {
+                    return res.status(404).json({ message: 'Invalid question' });
+                } else {
+                    return res.status(200).json({ message: 'Question data sended', singleQuestionData });
+                }
             } else {
                 return res.status(404).json({ message: 'Invalid question' });
             }
@@ -67,7 +82,7 @@ const questionVote = async (req, res) => {
         const userId = req.userId;
         const { voteIs, questionId } = req.body;
         const question = await questionData.findById({ _id: new ObjectId(questionId) })
-        console.log('question', question);
+        console.log('\n\nVote =\n', req.body);
         if (voteIs == 'upVote') {
             if (question.votes.upVote.userId.includes(userId)) { //upVoted question >> upVote
                 return res.status(304).json({ message: 'Already upVoted.' })
@@ -142,13 +157,30 @@ const questionSave = async (req, res) => {
     }
 };
 
+const questionUnsave = async (req, res) => {
+    try {
+        const { questionId } = req.body
+        const userId = req.userId;
+        const userDetails = await userData.findById({ _id: userId });
+        if (!userDetails) {
+            return res.status(404).json({ message: 'User not found.' });
+        } else {
+            await userDetails.updateOne({ $pull: { 'savedQuestions': questionId } });
+            await userDetails.save();
+            return res.status(200).json({ message: 'Question successfully unsaved.' })
+        }
+    } catch (err) {
+        return res.status(500).json({ message: "Internal server error." })
+    }
+};
+
 const reportQuestion = async (req, res) => {
     try {
         const { questionId } = req.body;
         const userId = req.userId;
         const questionDetails = await questionData.findById({ _id: questionId });
         if (!questionDetails) {
-            return res.status(401).json({message: 'Invalid question.'});
+            return res.status(401).json({ message: 'Invalid question.' });
         } else {
             const reportedQuestionDetails = await reportedQuestionData.findOne({ question: questionId });
             if (reportedQuestionDetails) {
@@ -176,6 +208,87 @@ const reportQuestion = async (req, res) => {
     }
 };
 
+const editQuestion = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { title, body, tags } = req.body.inputData;
+        const question = { title: title, body: body };
+        const questionId = req.body.questionId;
+        //Need to get the question from 'questions' that matching userId and questionId(_id)
+        const data = await questionData.findById(questionId);
+
+        if (!data) {
+            return res.status(404).json({ message: 'Question not found' });
+        } else if (!data.userId == userId) {
+            return res.status(401).json({ error: "Unauthorized: You do not have access to edit this question." });
+        }
+        data.question = question;
+        data.tags = tags;
+        const saved = await data.save();
+        console.log(saved, 'saved');
+        return res.status(200).json({ message: 'Question edited successfully' });
+    } catch (err) {
+        console.log(err.message);
+        return err.status(500).json({ message: 'Internal server error.' });
+    }
+}
+
+const delteQuestion = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { questionId } = req.body;
+        console.log(questionId, '<<<>>>', userId);
+        questionData.findOne({ _id: questionId })
+            .then((question) => {
+                if (!question) {
+                    console.log('Document not found');
+                    return res.status(404).json({ message: 'Requested question not found.', status: 'Not found.' });
+                }
+                if (!question.userId.equals(userId)) {
+                    console.log('Unauthorized: User ID does not match.');
+                    return res.status(401).json({ message: 'Unauthorized: You do not have access to edit this question.', status: 'Unauthorized' });
+                }
+                questionData.deleteOne({ _id: questionId })
+                    .then(() => {
+                        console.log('Document deleted successfully');
+                        return res.status(200).json({ message: 'Document deleted successfully.', status: 'Success.' });
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting document:', error);
+                        return res.status(500).json({ message: "Internal server error.", status: 'Failed.' })
+                    });
+            })
+            .catch((error) => {
+                console.error('Error finding document:', error);
+                return res.status(404).json({ message: 'Requested question not found.', status: 'Not found.' });
+            });
+
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+}
+
+
+const savedQuestionsData = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const user = await userData.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const savedQuestionIds = user.savedQuestions;
+        const savedQuestions = await questionData.find({ _id: { $in: savedQuestionIds } })
+            .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+            .populate('userId', 'name userName');
+        return res.status(200).json({ message: 'Successfully got saved questions data.', savedQuestionsData: savedQuestions });
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+}
+
 module.exports = {
     addQuestion,
     questionsDataGet,
@@ -183,4 +296,8 @@ module.exports = {
     questionVote,
     questionSave,
     reportQuestion,
+    editQuestion,
+    delteQuestion,
+    savedQuestionsData,
+    questionUnsave,
 };

@@ -45,9 +45,13 @@ export default function MyAnswer() {
             <div className='text-2xl capitalize font-semibold pb-5'>My Answers</div>
             <div className='flex flex-col rounded-lg border h-fit p-3 gap-3'>                 {/* Answer */}
 
-                {data && data.map((answer) => (
-                    <Answer answer={answer} key={answer?._id} onUpdate={triggerFetchData} />
-                ))}
+                {data.length > 0 ? (
+                    data && data.map((answer) => (
+                        <Answer answer={answer} key={answer?._id} onUpdate={triggerFetchData} />
+                    ))
+                ) : (
+                    <div className='p-3 text-lg font-medium text-center'>No Answers to display, answer some questions.</div>
+                )}
 
             </div>
         </div>

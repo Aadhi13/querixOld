@@ -16,6 +16,9 @@ const getUserData = createAsyncThunk('userData/getUserData', async (user, thunkA
     } catch (err) {
         if (err.response.data.message == 'Invalid jwt token.' || err.response.data.message == 'Jwt expired.' || err.response.data.message == 'No jwt token.') {
             localStorage.removeItem('user');
+            //In here I want to go to the route "/login"
+            window.location.href = '/signin';
+            console.log('dude');
             return thunkAPI.rejectWithValue(err.response.data.message)
         }
         return thunkAPI.rejectWithValue(err)
@@ -33,6 +36,7 @@ const userDataSlice = createSlice({
         logout: (state) => {
             localStorage.removeItem('user');
             state.userData = null
+            window.location.href = '/signin';
         }
     },
     extraReducers: (builder) => {

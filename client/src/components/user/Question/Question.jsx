@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { SpinningWheel, DownVote, DropDown, Media, UpVote, Close, Share, Save, Flag } from '../../../assets/icons/Icons';
+import { SpinningWheel, DownVote, DropDown, Media, UpVote, Close, Share, Save, Flag, Saved } from '../../../assets/icons/Icons';
 import Answer from '../Answers/Answer';
 import Comment from '../Comment/Comment';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from '../../../api/axios';
 import { useSelector } from 'react-redux';
+import AnswerInput from '../Answers/AnswerInput';
+import CommentInput from '../Comment/CommentInput';
 
 
 const INPUT_REGEX = /[^\s\n]/;
@@ -22,21 +23,11 @@ function Question() {
     const [question, setQuestion] = useState({});
 
     const [vote, setVote] = useState(0);
+    const [save, setSave] = useState(false);
     const initialVoteCount = question.votes && question.votes.upVote.count - question.votes.downVote.count;
     const [voteCount, setVoteCount] = useState(initialVoteCount);
 
-    const [input, setInput] = useState('')
-    const [validInput, setValidInput] = useState(false);
-    const [commentInput, setCommentInput] = useState('')
-    const [validCommentInput, setValidCommentInput] = useState('')
-
-    const [rows, setRows] = useState(2);
-    const [rowsComment, setRowsComment] = useState(2);
-    const [loader, setLoader] = useState(false);
-    const [loaderComment, setLoaderComment] = useState(false);
     const [isAnswer, setIsAnswer] = useState(location.state ? location.state.isAnswer : true);
-    const textAreaRef = useRef(null);
-    const textAreaRefComment = useRef(null);
     const userData = useSelector((state) => state.userData.userData);
     const fakeData = {
         _id: '',
@@ -55,6 +46,9 @@ function Question() {
     const [hasMoreComment, setHasMoreComment] = useState(false);
     const [pageNumberComment, setPageNumberComment] = useState(0)
     const observer = useRef()
+
+    const [newAnswerCount, setNewAnswerCount] = useState(0);
+    const [newCommentCount, setNewCommentCount] = useState(0);
 
     //Modal
     const textAreaRefModal = useRef(null);
@@ -85,7 +79,7 @@ function Question() {
         if (loadingComment) return
         if (observer.current) observer.current.disconnect()
         observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
+            if (entries[0].isIntersecting && hasMoreComment) {
                 setPageNumberComment(prevPageNumberComment => prevPageNumberComment + 1)
             }
         })
@@ -93,8 +87,7 @@ function Question() {
     }, [loadingComment, hasMoreComment])
 
 
-
-    //To update the vote count in question and check if user is voted or not
+    //To update the vote count in question and check if user is voted or not & saved or not
 
     useEffect(() => {
         if (question.votes && question.votes.upVote.userId.includes(userData ? userData._id : fakeData._id)) {
@@ -103,6 +96,10 @@ function Question() {
         } else if (question.votes && question.votes.downVote.userId.includes(userData ? userData._id : fakeData._id)) {
             setVoteCount(question.votes.upVote.count - question.votes.downVote.count)
             setVote(-1);
+        }
+
+        if (userData?.savedQuestions?.includes(question?._id)) {
+            setSave(true)
         }
     }, [question])
 
@@ -128,7 +125,6 @@ function Question() {
     //To get answers data 
 
     useEffect(() => {
-        console.log('useEffect for getting answers data');
         const fetchData = async () => {
             setLoading(true);
             const response = await axios.get("/answers-data", { params: { page: pageNumber, questionId: id } });
@@ -156,6 +152,59 @@ function Question() {
         };
         fetchData()
     }, [pageNumberComment])
+
+
+    //Refetch data 
+
+    const reFetchData = async () => {
+        setLoading(true);
+        const response = await axios.get("/answers-data", { params: { page: pageNumber, questionId: id } });
+        const updatedAnswersData = [...response.data.answersData];
+        setAnswersData(updatedAnswersData);
+        setHasMore(response.data.answersCount > updatedAnswersData.length);
+        setLastAnswer(response.data.answersCount == updatedAnswersData.length);
+        setNewAnswerCount(prevCount => prevCount + 1)
+        setLoading(false);
+    };
+
+
+    //Refetch comment data
+
+    const reFetchDataComment = async () => {
+        setLoadingComment(true)
+        const response = await axios.get("/comments-data", { params: { page: pageNumberComment, questionId: id } });
+        const updatedCommentsData = [...response.data.commentsData];
+        setCommentsData(updatedCommentsData);
+        setHasMoreComment(response.data.commentsCount > updatedCommentsData.length);
+        setLastComment(response.data.commentsCount == updatedCommentsData.length);
+        setNewCommentCount(prevCount => prevCount + 1)
+        setLoadingComment(false);
+    };
+
+    //To refetch data 
+
+    const triggerFetchData = () => {
+        // Reset pagination-related state
+        setPageNumber(0);
+        setAnswersData([]);
+        setHasMore(false);
+
+        // Fetch data again
+        reFetchData();
+    };
+
+
+    //To refetch comment data 
+
+    const triggerFetchDataComment = () => {
+        // Reset pagination-related state
+        setPageNumberComment(0);
+        setCommentsData([]);
+        setHasMoreComment(false);
+
+        // Fetch data again
+        reFetchDataComment();
+    };
 
 
     //Below useEffect will handle the answer url. By finding the answer among the answersData. 
@@ -191,6 +240,11 @@ function Question() {
                 position: toast.POSITION.TOP_CENTER,
                 autoClose: 2000
             });
+        } else if (type == 'noUserUnsave') {
+            toast.error('Please login to Unsave question.', {
+                position: toast.POSITION.TOP_CENTER
+            });
+
         } else if (type == 'noUserAnswer') {
             toast.error('Please login to answer question.', {
                 position: toast.POSITION.TOP_CENTER,
@@ -207,6 +261,11 @@ function Question() {
             });
         } else if (type == 'questionSaveSuccess') {
             toast.success('Question saved.', {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 1000
+            });
+        } else if (type == 'questionUnsaveSuccess') {
+            toast.success('Question unsaved.', {
                 position: toast.POSITION.TOP_CENTER,
                 autoClose: 1000
             });
@@ -338,83 +397,6 @@ function Question() {
 
     //To handle the textarea growing feature and changing input (increasing the rows when line breaks occuring in all possible ways)
 
-    const texAreaHandleInput = (e) => {
-        setInput(e.target.value);
-        const result = INPUT_REGEX.test(e.target.value);
-        setValidInput(result);
-        const textarea = textAreaRef.current;
-        const calContentHeight = (lineHeight) => {
-            let origHeight = textarea.style.height;
-            let height = textarea.offsetHeight;
-            let scrollHeight = textarea.scrollHeight;
-            if (height >= scrollHeight) {
-                textarea.style.height = (height + lineHeight) + 'px';
-                textarea.style.overflow = 'hidden';
-                if (scrollHeight < textarea.scrollHeight) {
-                    while (textarea.offsetHeight >= textarea.scrollHeight) {
-                        textarea.style.height = (height -= lineHeight) + 'px';
-                    }
-                    while (textarea.offsetHeight < textarea.scrollHeight) {
-                        textarea.style.height = (height++) + 'px';
-                    }
-                    textarea.style.height = origHeight;
-                    return height
-                }
-            } else {
-                return scrollHeight;
-            }
-        }
-        const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
-        const scrollHeight = calContentHeight(lineHeight);
-        const nLines = Math.floor(scrollHeight / lineHeight);
-        if (nLines < 2) {
-            setRows(2);
-        } else {
-            setRows(nLines);
-        }
-    }
-
-
-    //To handle the textarea growing feature and changing comment input (increasing the rows when line breaks occuring in all possible ways)
-
-    const texAreaHandleInputComment = (e) => {
-        setCommentInput(e.target.value)
-        const result = INPUT_REGEX.test(e.target.value);
-        setValidCommentInput(result)
-        const textarea = textAreaRefComment.current;
-        const calContentHeight = (lineHeight) => {
-            let origHeight = textarea.style.height;
-            let height = textarea.offsetHeight;
-            let scrollHeight = textarea.scrollHeight;
-            if (height >= scrollHeight) {
-                textarea.style.height = (height + lineHeight) + 'px';
-                textarea.style.overflow = 'hidden';
-                if (scrollHeight < textarea.scrollHeight) {
-                    while (textarea.offsetHeight >= textarea.scrollHeight) {
-                        textarea.style.height = (height -= lineHeight) + 'px';
-                    }
-                    while (textarea.offsetHeight < textarea.scrollHeight) {
-                        textarea.style.height = (height++) + 'px';
-                    }
-                    textarea.style.height = origHeight;
-                    return height
-                }
-            } else {
-                return scrollHeight;
-            }
-        }
-        const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
-        const scrollHeight = calContentHeight(lineHeight);
-        const nLines = Math.floor(scrollHeight / lineHeight);
-        if (nLines < 2) {
-            setRowsComment(2);
-        } else {
-            setRowsComment(nLines);
-        }
-    }
-
-    //To handle the textarea growing feature and changing input (increasing the rows when line breaks occuring in all possible ways)
-
     const texAreaHandleInputModal = (e) => {
         setInputModal(e.target.value);
         const result = INPUT_REGEX.test(e.target.value);
@@ -469,7 +451,10 @@ function Question() {
                     withCredentials: true
                 })
                 if (response.data.message == 'Question successfully saved.') {
-                    showToastMessage('questionSaveSuccess')
+                    showToastMessage('questionSaveSuccess', {
+                        toastId: 'saveQuestion'
+                    })
+                    setSave(true)
                 }
             } catch (err) {
                 if (!err?.response) {
@@ -489,134 +474,52 @@ function Question() {
     }
 
 
+    //Handle Unsave questoin
+
+    const handleUnsaveQuestion = async () => {
+        closeDialog();
+        const token = localStorage.getItem('user');
+        if (!token) {
+            return;
+        } else {
+            try {
+                const response = await axios.put("/question-unsave", { questionId: question._id }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: token
+                    },
+                    withCredentials: true
+                })
+                if (response.data.message == 'Question successfully unsaved.') {
+                    showToastMessage('questionUnsaveSuccess', {
+                        toastId: 'UnSaveQuestion'
+                    })
+                    setSave(false)
+                }
+            } catch (err) {
+                if (!err?.response) {
+                    showToastMessage('errorServer')
+                } else if (err.code === "ERR_NETWORK") {
+                    showToastMessage('errorNetwork')
+                } else if (err.response.data.message == 'User not found.') {
+                    showToastMessage('noUserUnsave')
+                } else if (err.response.data.message == "Internal server error.") {
+                    showToastMessage('errorServer')
+                } else {
+                    showToastMessage('errorUnknown')
+                }
+
+            }
+        }
+    }
+
+
     //Handle share question
 
     const handleShareQuestion = () => {
         closeDialog();
         showToastMessage('linkCopied')
         navigator.clipboard.writeText(window.location.origin + location.pathname)
-    }
-
-
-    //Handle answer submit
-
-    const handleAnswerSubmit = async (e) => {
-        if (!validInput) {
-            return;
-        }
-        e.preventDefault();
-        try {
-            setLoader(true);
-            const token = localStorage.getItem('user')
-            if (!token) {
-                setInput('');
-                setRows(2);
-                showToastMessage('noUserAnswer')
-                setLoader(false);
-                return;
-                //Can't answer question. Please login again.
-            }
-            const response = await axios.post('/add-answer', { input, questionId: question._id }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: token
-                },
-                withCredentials: true
-            });
-
-            if (response.data.message == 'Answer submitted.') {
-                setInput('');
-                setRows(2);
-                showToastMessage('successAnswer');
-                window.location.reload(false);
-
-            }
-            setLoader(false);
-        } catch (err) {
-            if (err == 'no token') {
-                setInput('');
-                setRows(2);
-                showToastMessage('noUserAnswer')
-                setLoader(false);
-                //Can't submit answer. Please login again.
-            } else if (err.response.data.message == 'Answer is not complete.') {
-                showToastMessage('unfinishedAnswer')
-                setLoader(false);
-                //Can't submit unfinished question. Type both the tilte and your question.
-            } else if (err.response.data.message == 'Invalid jwt token.' || 'Jwt expired.' || 'No user found.' || 'no token' || 'No jwt token.') {
-                localStorage.removeItem('user')
-                setInput('');
-                setRows(2);
-                showToastMessage('noUserAnswer')
-                setLoader(false);
-                //Can't submit answer. Please login again.
-            } else if (err.response.data.message == 'Invalid question.') {
-                setInput('');
-                setRows(2);
-                showToastMessage('noQuestion')
-                setLoader(false);
-            }
-        }
-    }
-
-    //Handle comment submit
-
-    const handleCommentSubmit = async (e) => {
-        if (!validCommentInput) {
-            return;
-        }
-        e.preventDefault();
-        try {
-            setLoaderComment(true);
-            const token = localStorage.getItem('user')
-            if (!token) {
-                setCommentInput('');
-                setRowsComment(2);
-                showToastMessage('noUserComment')
-                setLoaderComment(false);
-                return;
-                //Can't comment question. Please login again.
-            }
-            const response = await axios.post('/add-comment', { input: commentInput, questionId: question._id }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: token
-                },
-                withCredentials: true
-            });
-
-            if (response.data.message == 'Comment submitted.') {
-                setCommentInput('');
-                setRowsComment(2);
-                showToastMessage('successComment');
-                window.location.reload(false);
-            }
-            setLoaderComment(false);
-        } catch (err) {
-            if (err == 'no token') {
-                setCommentInput('');
-                setRowsComment(2);
-                showToastMessage('noUserComment')
-                setLoaderComment(false);
-                //Can't submit comment. Please login again.
-            } else if (err.response.data.message == 'Comment is not complete.') {
-                showToastMessage('unfinishedComment')
-                setLoaderComment(false);
-                //Can't submit unfinished comment. Fill the input fields.
-            } else if (err.response.data.message == 'Invalid jwt token.' || 'Jwt expired.' || 'No user found.' || 'no token' || 'No jwt token.') {
-                localStorage.removeItem('user')
-                setCommentInput('');
-                setRowsComment(2);
-                showToastMessage('noUserComment')
-                setLoaderComment(false);
-                //Can't submit comment. Please login again.
-            } else if (err.response.data.message == 'Invalid question.') {
-                setCommentInput('');
-                setRowsComment(2);
-                showToastMessage('noQuestion')
-                setLoaderComment(false);
-            }
-        }
     }
 
 
@@ -743,8 +646,6 @@ function Question() {
         }
     };
 
-
-
     // Function to calculate the modal position
     const calculateModalPosition = () => {
         const triggerElement = triggerRef.current;
@@ -770,7 +671,7 @@ function Question() {
     return (
         <>
             <ToastContainer />
-            <div className='mx-72 '>
+            <div className='mx-72 mt-5'>
 
                 <div className='flex flex-row border-gray-300 border mx-56 rounded-lg mb-4'>
                     <div className='p-2'>
@@ -796,9 +697,9 @@ function Question() {
                             <div className='flex items-center ml-1 text-base  font-medium'>{question.userId?.name}</div>
                             <div className='flex items-center ml-1 text-sm '>@{question.userId?.userName}</div>
                         </div>
-                        <div className=''>
+                        <div className='mr-4'>
                             <div className='font-semibold text-xl my-3'>{question?.question?.title}</div>
-                            <div className='pr-1.5 mb-3'>{question?.question?.body}</div>
+                            <div className='pr-1.5 mb-3'><pre className='whitespace-pre-wrap font-sans'>{question?.question?.body}</pre></div>
                         </div>
                         <div className='flex justify-start items-center mb-3'>
                             {question.tags && question.tags.map((tag, index) => (
@@ -812,7 +713,7 @@ function Question() {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                     </svg>
                                 </div>
-                                <button className='ml-1 text-sm font-medium'>{question?.answers?.length} Answers</button>
+                                <button className='ml-1 text-sm font-medium'>{question?.answers?.length + newAnswerCount} Answers</button>
                             </div>
                             <div className={`mr-2 flex justify-center items-center ${isAnswer ? 'bg-none' : 'bg-gray-300'} hover:bg-gray-300 rounded-md p-1.5 cursor-pointer`} onClick={() => setIsAnswer(false)}>
                                 <div>
@@ -820,14 +721,24 @@ function Question() {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                                     </svg>
                                 </div>
-                                <button className='ml-1 text-sm font-medium'>{question?.comments?.length} Comments</button>
+                                <button className='ml-1 text-sm font-medium'>{question?.comments?.length + newCommentCount} Comments</button>
                             </div>
-                            <div className='mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5 cursor-pointer' onClick={handleSaveQuestion}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                                </svg>
-                                <button className='ml-1 text-sm font-medium '>Save</button>
-                            </div>
+                            {save ?
+                                <div className='mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5 cursor-pointer text-green-700' onClick={handleUnsaveQuestion}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                                        <path fillRule="evenodd" d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 01-1.085.67L12 18.089l-7.165 3.583A.75.75 0 013.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93z" clipRule="evenodd" />
+                                    </svg>
+
+                                    <button className='ml-1 text-sm font-medium '>Saved</button>
+                                </div>
+                                :
+                                <div className='mr-2 flex justify-center items-center hover:bg-gray-300 hover:rounded-md p-1.5 cursor-pointer' onClick={handleSaveQuestion}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                    </svg>
+                                    <button className='ml-1 text-sm font-medium '>Save</button>
+                                </div>
+                            }
                             <div className='mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5 cursor-pointer' onClick={handleShareQuestion}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 256 256">
                                     <path fill="currentColor" d="m237.66 106.35l-80-80A8 8 0 0 0 144 32v40.35c-25.94 2.22-54.59 14.92-78.16 34.91c-28.38 24.08-46.05 55.11-49.76 87.37a12 12 0 0 0 20.68 9.58c11-11.71 50.14-48.74 107.24-52V192a8 8 0 0 0 13.66 5.65l80-80a8 8 0 0 0 0-11.3ZM160 172.69V144a8 8 0 0 0-8-8c-28.08 0-55.43 7.33-81.29 21.8a196.17 196.17 0 0 0-36.57 26.52c5.8-23.84 20.42-46.51 42.05-64.86C99.41 99.77 127.75 88 152 88a8 8 0 0 0 8-8V51.32L220.69 112Z"></path>
@@ -846,9 +757,15 @@ function Question() {
                                     <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={openDialog2}>
                                         <div className='px-1 mr-2 flex items-center justify-center'><Flag width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Report</div>
                                     </div>
-                                    <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={handleSaveQuestion}>
-                                        <div className='px-1 mr-2 flex items-center justify-center'><Save width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Save</div>
-                                    </div>
+                                    {save ?
+                                        <div className='px-2 py-1.5 hover:bg-gray-400/40 text-green-700 flex items-center justify-start' onClick={handleUnsaveQuestion}>
+                                            <div className='px-1 mr-2 flex items-center justify-center'><Saved width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Saved</div>
+                                        </div>
+                                        :
+                                        <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={handleSaveQuestion}>
+                                            <div className='px-1 mr-2 flex items-center justify-center'><Save width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Save</div>
+                                        </div>
+                                    }
                                     <div className='px-2 py-1.5 hover:bg-gray-400/40 flex items-center justify-start' onClick={handleShareQuestion}>
                                         <div className='px-1 mr-2 flex items-center justify-center'><Share width="1.3em" height="1.3em" /></div> <div className='font-[450]'>Share</div>
                                     </div>
@@ -894,40 +811,7 @@ function Question() {
 
                                 {/* Here we are gonna display the input box for answering based on user is logged in or not. */}
                                 {userData ?
-                                    <div className='flex flex-row border-gray-400 border  rounded-lg mb-4'>
-                                        <div className='p-2 flex flex-col items-center'>
-                                            <div className='flex justify-center items-center rounded-full bg-profileBtBg w-12 h-12 overflow-hidden'>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-profileBt w-11 h-11 mt-4">
-                                                    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div className='flex flex-col pb-3 w-full'>
-                                            <div className='mt-2.5 flex justify-start items-center'>
-                                                <div className='mb-2.5'>
-                                                    <div className='flex items-center ml-1 text-base  font-medium'>{userData?.name}</div>
-                                                    <div className='flex items-center ml-1 text-sm '>@{userData?.userName}</div>
-                                                </div>
-                                            </div>
-                                            {/* The textarea aka Input box for answering questions */}
-                                            <div>
-                                                <form>
-                                                    <div className='flex justify-center items-center'>
-                                                        <textarea placeholder={`Type your answer to ${question.userId?.name}'s question.`} ref={textAreaRef} className='overflow-hidden pr-1.5 mb-3 w-[98%] outline-none text-base' onInput={texAreaHandleInput} rows={rows} value={input} name='answer'></textarea>
-                                                        <br />
-                                                    </div>
-                                                </form>
-                                            </div>
-                                            <div className='flex justify-center mr-6 ml-0.5 items-center border-b border-gray-400 mt-3'></div>
-                                            <div className='flex justify-between items-center mt-3'>
-                                                <div className='flex justify-center items-center mr-6 py-1 px-4 font-medium text-lg'>
-                                                    <button onClick={handleAnswerSubmit} disabled={!validInput} className='disabled:opacity-50 disabled:hover:bg-gray-400 bg-gray-400 hover:bg-profileBt rounded-2xl mr-6 py-1 px-4 font-medium text-lg'>
-                                                        {!loader ? 'Submit' : 'Submiting...'}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <AnswerInput userData={userData} question={question} onUpdate={triggerFetchData} />
                                     :
                                     // If the user is not signed in 
                                     <div className='py-4 mb-3 text-lg font-semibold'>To answer question <Link to='/signin' className='text-blue-500 hover:text-blue-700'>Sign In</Link></div>
@@ -935,11 +819,7 @@ function Question() {
 
                                 {/* Here we are going to map the Answer component so there would be N number of answers with their own states. */}
                                 {Array.isArray(question.answers) && question.answers.length > 0 ? answersData.map((answer, index) => (
-
-                                    (Math.floor(answersData.length * 0.75) === index + 1) ?
-                                        // (index === answersData.length - 3) ?
-                                        <Answer ref={lastAnswerRef} key={answer._id} answer={answer} index={index} highliteAnswer={highliteAnswer} /> :
-                                        <Answer key={answer._id} answer={answer} index={index} highliteAnswer={highliteAnswer} />
+                                    <Answer ref={answersData.length === index + 1 ? lastAnswerRef : null} key={answer._id} answer={answer} index={index} highliteAnswer={highliteAnswer} onUpdate={triggerFetchData} />
                                 )) :
                                     //If there is no answers
                                     <div className='text-center text-xl tracking-wide font-semibold mt-12'>Be the first one to answer to <span className='text-linkedin'>{question?.userId?.name}</span>'s question.</div>
@@ -963,40 +843,7 @@ function Question() {
 
                                 {/* Here we are going to display the input box for commenting based on the user is logged in or not. */}
                                 {userData ?
-                                    <div className='flex flex-row border-gray-400 border  rounded-lg mb-4'>
-                                        <div className='p-2 flex flex-col items-center'>
-                                            <div className='flex justify-center items-center rounded-full bg-profileBtBg w-12 h-12 overflow-hidden'>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-profileBt w-11 h-11 mt-4">
-                                                    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div className='flex flex-col pb-3 w-full'>
-                                            <div className='mt-2.5 flex justify-start items-center'>
-                                                <div className='mb-2.5'>
-                                                    <div className='flex items-center ml-1 text-base  font-medium'>{userData?.name}</div>
-                                                    <div className='flex items-center ml-1 text-sm '>@{userData?.userName}</div>
-                                                </div>
-                                            </div>
-                                            {/* The textarea aka Input box for commenting questions */}
-                                            <div>
-                                                <form>
-                                                    <div className='flex justify-center items-center'>
-                                                        <textarea placeholder={`Type your comment to ${question.userId?.name}'s question.`} ref={textAreaRefComment} className='overflow-hidden pr-1.5 mb-3 w-[98%] outline-none text-base' onInput={texAreaHandleInputComment} rows={rowsComment} value={commentInput} name='comment'></textarea>
-                                                        <br />
-                                                    </div>
-                                                </form>
-                                            </div>
-                                            <div className='flex justify-center mr-6 ml-0.5 items-center border-b border-gray-400 mt-3'></div>
-                                            <div className='flex justify-between items-center mt-3'>
-                                                <div className='flex justify-center items-center mr-6 py-1 px-4 font-medium text-lg'>
-                                                    <button onClick={handleCommentSubmit} disabled={!validCommentInput} className='disabled:opacity-50 disabled:hover:bg-gray-400 bg-gray-400 hover:bg-profileBt rounded-2xl mr-6 py-1 px-4 font-medium text-lg'>
-                                                        {!loaderComment ? 'Submit' : 'Submiting...'}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <CommentInput userData={userData} question={question} onUpdate={triggerFetchDataComment} />
                                     :
                                     // If the user is not signed in 
                                     <div className='py-4 mb-3 text-lg font-semibold'>To comment question <Link to='/signin' className='text-blue-500 hover:text-blue-700'>Sign In</Link></div>
@@ -1004,10 +851,7 @@ function Question() {
 
                                 {/* Here we are going to map the Comment component so there would be N number of Comments with their own states. */}
                                 {Array.isArray(question.comments) && question.comments.length > 0 ? commentsData.map((comment, index) => (
-                                    (Math.floor(commentsData.length * 0.75) === index + 1) ?
-                                        // (index === commentsData.length - 3) ?
-                                        <Comment ref={lastCommentRef} key={comment._id} comment={comment} index={index} /> :
-                                        <Comment key={comment._id} comment={comment} index={index} />
+                                    <Comment ref={commentsData.length === index + 1 ? lastCommentRef : null} key={comment._id} comment={comment} index={index} onUpdate={triggerFetchData} />
                                 )) :
                                     //If there is no comments
                                     <div className='text-center text-xl tracking-wide font-semibold mt-12'>Be the first one to comment to <span className='text-linkedin'>{question?.userId?.name}</span>'s question.</div>

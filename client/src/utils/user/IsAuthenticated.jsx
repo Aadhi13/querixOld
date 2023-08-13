@@ -18,7 +18,9 @@ export default function IsAuthenticated({ children }) {
                 //If user is accessing the '/signin' route when signed in then goes to home page.
                 return navigate("/")
             }
-        } 
+        } else if (location.pathname == '/account') {
+            return navigate("/")
+        }
     }, [])
     return children
 }
