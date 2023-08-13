@@ -69,7 +69,6 @@ export default function Home() {
     }, [pageNumber])
 
     const triggerFetchData = () => {
-        console.log('func triggered');
         // Reset pagination-related state
         setPageNumber(0);
         setQuestions([]);

@@ -27,11 +27,7 @@ export default function Question(props) {
         title: true,
         body: true,
     });
-
-    useEffect(() => {
-        console.log("We are at Question component");
-    }, [])
-
+    
     useEffect(() => {
         setInputData(prevInputData => ({
             ...prevInputData,
@@ -97,7 +93,6 @@ export default function Question(props) {
     };
 
     const handleEditButton = () => {
-        console.log('clicked. iseditiong: ', isEditing);
         setIsEditing(!isEditing)
     }
 
@@ -144,7 +139,6 @@ export default function Question(props) {
     }
 
     const handleSubmitButton = async () => {
-        console.log('clicked submit');
         setLoading(true);
         // Make a put request to submit edited values
         try {
@@ -160,7 +154,6 @@ export default function Question(props) {
                 },
                 withCredentials: true,
             });
-            console.log(res.data);
         } catch (err) {
             console.log(err.message);
         }

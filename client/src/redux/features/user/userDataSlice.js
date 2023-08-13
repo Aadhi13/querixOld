@@ -18,7 +18,6 @@ const getUserData = createAsyncThunk('userData/getUserData', async (user, thunkA
             localStorage.removeItem('user');
             //In here I want to go to the route "/login"
             window.location.href = '/signin';
-            console.log('dude');
             return thunkAPI.rejectWithValue(err.response.data.message)
         }
         return thunkAPI.rejectWithValue(err)

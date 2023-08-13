@@ -179,90 +179,40 @@ const statisticsDataGet = async (req, res) => {
 
 const trendingDataGet = async (req, res) => {
     try {
-        console.log('anything');
-        const mostUpvotedQuestion = await questionData
-            .aggregate([
-                {
-                    $sort: { 'votes.upVote.count': -1 }, // Sort by most upvotes
-                },
-                {
-                    $limit: 1, // Get only one document (most upvoted)
-                },
-            ])
+        const trendingMostVoted = await questionData
+            .find({ blockStatus: false })
+            .sort({ "votes.upVote.count": -1 })
+            .limit(2);
 
-        // Get the most downvoted question
-        const mostDownvotedQuestion = await questionData
-            .aggregate([
-                {
-                    $sort: { 'votes.downVote.count': -1 }, // Sort by most downvotes
-                },
-                {
-                    $limit: 1, // Get only one document (most downvoted)
-                },
-            ])
+        const trendingMostDownVoted = await questionData
+            .find({ blockStatus: false })
+            .sort({ "votes.downVote.count": -1 })
+            .limit(1);
 
-        // Get the most upvoted comment
-        const mostUpvotedComment = await commentData
-            .aggregate([
-                {
-                    $sort: { 'votes.upVote.count': -1 }, // Sort by most upvotes
-                },
-                {
-                    $limit: 1, // Get only one document (most upvoted)
-                },
-            ])
+        const trendingMostAnswered = await questionData
+            .find({ blockStatus: false })
+            .sort({ "answers.length": -1 })
+            .limit(1);
 
-        // Get the most downvoted comment
-        const mostDownvotedComment = await commentData
-            .aggregate([
-                {
-                    $sort: { 'votes.downVote.count': -1 }, // Sort by most downvotes
-                },
-                {
-                    $limit: 1, // Get only one document (most downvoted)
-                },
-            ])
+        const trendingMostCommented = await questionData
+            .find({ blockStatus: false })
+            .sort({ "comments.length": -1 })
+            .limit(1);
 
-        // Get the most upvoted answer
-        const mostUpvotedAnswer = await answerData
-            .aggregate([
-                {
-                    $sort: { 'votes.upVote.count': -1 }, // Sort by most upvotes
-                },
-                {
-                    $limit: 1, // Get only one document (most upvoted)
-                },
-            ])
-
-        // Get the most downvoted answer
-        const mostDownvotedAnswer = await answerData
-            .aggregate([
-                {
-                    $sort: { 'votes.downVote.count': -1 }, // Sort by most downvotes
-                },
-                {
-                    $limit: 1, // Get only one document (most downvoted)
-                },
-            ])
-
-        // Add all the most voted data to the 'data' array
-        const data = [
-            mostUpvotedQuestion[0],
-            mostDownvotedQuestion[0],
-            mostUpvotedComment[0],
-            mostDownvotedComment[0],
-            mostUpvotedAnswer[0],
-            mostDownvotedAnswer[0],
+        const trendingQuestions = [
+            ...trendingMostVoted,
+            ...trendingMostDownVoted,
+            ...trendingMostAnswered,
+            ...trendingMostCommented
         ];
 
-        console.log(data, 'data');
-
-        return res.status(200).json({ message: 'Trending data sented.', data });
+        return res.status(200).json({ message: 'Trending data is sended.', trendingData: trendingQuestions });
     } catch (err) {
         console.log(err.message);
-        return res.status(500).json({ message: 'Internal server error.' });
+        return res.status(500).json({ message: "Internal server error." });
     }
-}
+};
+
 
 module.exports = {
     adminDataGet,

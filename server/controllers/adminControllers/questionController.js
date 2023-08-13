@@ -7,12 +7,9 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const questionsDataGet = async (req, res) => {
     try {
-        console.log('req.query.page', req.query.page);
-        console.log('req.query.limit', req.query.limit);
         const { requestPage, requestLimit } = req.query;
         const page = parseInt(requestPage, 10) || 0;
         const limit = parseInt(requestLimit, 10) || 100;
-        console.log('page =>', page, '\n', 'limit =>', limit);
 
         const questionsData = await questionData.aggregate([
             {
@@ -80,9 +77,7 @@ const questionBlock = async (req, res) => {
     try {
         const questionId = req.params.questionId;
         //Logic for managing reportedQuestions status 
-        console.log('question Id', questionId);
         const reportedQuestionDetails = await reportedQuestionData.find({ question: questionId });
-        console.log('repoQuestion qB', reportedQuestionDetails);
         if (reportedQuestionDetails[0]?.status != 'blocked') {
             await reportedQuestionData.findOneAndUpdate({ question: questionId }, { $set: { status: 'blocked' } });
         }
@@ -99,9 +94,7 @@ const questionUnBlock = async (req, res) => {
         const questionId = req.params.questionId;
         //Logic for managing reportedQuestions status 
         const reportedQuestionDetails = await reportedQuestionData.find({ question: questionId });
-        console.log('repoQuestion qUB', reportedQuestionDetails);
         if (reportedQuestionDetails[0]?.status == 'blocked') {
-            console.log('inside uB rQD');
             await reportedQuestionData.findOneAndUpdate({ question: questionId }, { $set: { status: 'reviewed' } });
         }
         await questionData.findByIdAndUpdate(questionId, { $set: { blockStatus: false } })
@@ -185,7 +178,6 @@ const reportedQuestionsDataGet = async (req, res) => {
 const reportedQuestionReasonsDataGet = async (req, res) => {
     try {
         const reportedQuestionId = req.query.reportedQuestionId;
-        console.log('repo quest id', reportedQuestionId);
         const reportedQuestionDetails = await reportedQuestionData.aggregate([
             { $match: { _id: new mongoose.Types.ObjectId(reportedQuestionId) } },
             { $unwind: "$reportedBy" },
@@ -205,8 +197,6 @@ const reportedQuestionReasonsDataGet = async (req, res) => {
                 }
             }
         ]);
-        console.log('repoquestoindetails', reportedQuestionDetails);
-
         if (!reportedQuestionDetails || reportedQuestionDetails.length === 0) {
             return res.status(404).json({ message: "Invalid reported question." });
         } else {

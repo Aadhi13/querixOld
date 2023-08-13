@@ -25,11 +25,6 @@ export default function Profile() {
     });
 
     useEffect(() => {
-        console.log("We are at profile component");
-        dispatch(getUserData());
-    }, [])
-
-    useEffect(() => {
         setInputData(userData)
     }, [userData])
 
@@ -50,12 +45,10 @@ export default function Profile() {
 
 
     const handleEditButton = () => {
-        console.log('clicked');
         setIsEditing(!isEditing)
     }
 
     const handleSubmitButton = async () => {
-        console.log('clicked submit');
         setLoading(true);
         //Make a put request to submit edited values
         try {
@@ -72,7 +65,6 @@ export default function Profile() {
                 withCredentials: true,
             });
             dispatch(getUserData());
-            console.log(res.data);
         } catch (err) {
             console.log(err.message);
         }

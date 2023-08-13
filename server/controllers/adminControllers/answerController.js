@@ -76,7 +76,6 @@ const reportedAnswersDataGet = async (req, res) => {
 const reportedAnswerReasonsDataGet = async (req, res) => {
     try {
         const reportedAnswerId = req.query.reportedAnswerId;
-        console.log('repo ans id', reportedAnswerId);
         const reportedAnswerDetails = await reportedAnswerData.aggregate([
             { $match: { _id: new mongoose.Types.ObjectId(reportedAnswerId) } },
             { $unwind: "$reportedBy" },
@@ -96,7 +95,6 @@ const reportedAnswerReasonsDataGet = async (req, res) => {
                 }
             }
         ]);
-        console.log('repoAnswerdetails', reportedAnswerDetails);
 
         if (!reportedAnswerDetails || reportedAnswerDetails.length === 0) {
             return res.status(404).json({ message: "Invalid reported answer." });
@@ -114,7 +112,6 @@ const answerBlock = async (req, res) => {
     try {
         const answerId = req.params.answerId;
         //Logic for managing reportedAnswers status 
-        console.log('answer Id', answerId);
         const reportedAnswerDetails = await reportedAnswerData.find({ answer: answerId });
         if (reportedAnswerDetails[0]?.status != 'blocked') {
             await reportedAnswerData.findOneAndUpdate({ answer: answerId }, { $set: { status: 'blocked' } });

@@ -13,11 +13,6 @@ export default function SavedQuestion(props) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log("We are at Saved Question component");
-    }, [])
-
-
-    useEffect(() => {
         if (userData?.savedQuestions?.includes(savedQuestion?._id)) {
             setSave(true)
         }
@@ -103,13 +98,10 @@ export default function SavedQuestion(props) {
         const userId = await savedQuestion?.votes.upVote.userId
         if (userId.includes(userData._id)) {
             vote = 1;
-            console.log('its a upVote', vote);
         } else if (savedQuestion.votes.downVote.userId.includes(userData._id)) {
             vote = -1;
-            console.log('Its a downVote', vote);
         } else {
             vote = 0;
-            console.log('Its neutral', vote);
         }
 
         const token = localStorage.getItem('user');
@@ -145,13 +137,10 @@ export default function SavedQuestion(props) {
         const userId = await savedQuestion?.votes.upVote.userId
         if (userId.includes(userData._id)) {
             vote = 1;
-            console.log('its a upVote', vote);
         } else if (savedQuestion.votes.downVote.userId.includes(userData._id)) {
             vote = -1;
-            console.log('Its a downVote', vote);
         } else {
             vote = 0;
-            console.log('Its neutral', vote);
         }
 
         const token = localStorage.getItem('user');

@@ -7,22 +7,22 @@ import { useDispatch } from "react-redux";
 import { getAdminData } from "../../../redux/features/admin/adminDataSlice"
 import SimpleLineChart from "../Chart/SimpleLineChart";
 import axios from "../../../api/axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
   const [days, setDays] = useState(7);
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
   dispatch(getAdminData());
 
   useEffect(() => {
-    console.log('useEffect');
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('admin');
         if (!token) {
           dispatch(getAdminData());
         } else {
-          console.log(token, 'to000ekn');
           const res = (await axios.get("/admin/trending-data", {
             headers: {
               "Content-Type": "application/json",
@@ -30,8 +30,7 @@ export default function Dashboard() {
             },
             withCredentials: true,
           }));
-          console.log(res.data.data, 'res.data.data');
-          setData(res.data.data)
+          setData(res.data.trendingData)
         }
       } catch (err) {
         console.log(err);
@@ -79,15 +78,15 @@ export default function Dashboard() {
                   <SimpleLineChart days={days} />
                 </div>
               </div>
-              <div className="w-[500px] h-[535px] text-white">
-                <h1 className="text-3xl text-center my-5">Trending</h1>
-                <div className="bg-gray-800 text-xl p-5 gap-10 flex flex-col">
-                  <ul>Question</ul>
-                  <ul>Question</ul>
-                  <ul>Question</ul>
-                  <ul>Question</ul>
-                  <ul>Question</ul>
-                  <ul>Question</ul>
+              <div className="w-full h-ful">
+                <div className="text-white gap-3 flex flex-col">
+                  {data?.map((question, i) => (
+                    <div key={question._id + 'u' + i} className="hover:p-0.5 hover:cursor-pointer rounded-lg" onClick={() => navigate(`/question/${question._id}`)}>
+                      <div className="text-orange-600 text-xl font-medium">{question.question.title.split(' ').slice(0, 8).join(' ')}{question.question.title.split(' ').length > 5 ? '...' : ''}</div>
+                      <div className="text-lg ml-2">{question.question.body.split(' ').slice(0, 15).join(' ')}{question.question.body.split(' ').length > 10 ? '...' : ''}</div>
+                    </div>
+                  ))}
+
                 </div>
               </div>
             </div>

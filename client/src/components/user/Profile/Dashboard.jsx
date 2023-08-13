@@ -11,10 +11,6 @@ export default function Dashboard() {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        console.log("We are at Dashboard component");
-    }, [])
-
-    useEffect(() => {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('user');

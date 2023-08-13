@@ -558,7 +558,6 @@ function Question() {
     };
 
     const handleReportSubmit = async () => {
-        console.log('Report =>', question);
         try {
             setLoadingModal(true);
             const token = localStorage.getItem('user');

@@ -56,16 +56,11 @@ export default function ReportedQuestionManage() {
         }
     }, []);
 
-    useEffect(() => {
-        console.log('Reported questions ', reportedQuestions);
-    }, [reportedQuestions])
-
     const data = useMemo(() => reportedQuestions, [reportedQuestions]);
 
 
     //blocking & unblocking reported questions --SAME LOGIC AS QUESTION ACTIONS IN QUESTION MANAGE--
     const handleQuestionAction = async (questionId, userName, action) => {
-        console.log('questionId => ', questionId, '\nuserName => ', userName, '\naction => ', action);
         try {
             const token = localStorage.getItem("admin");
             if (!token) {
@@ -126,7 +121,6 @@ export default function ReportedQuestionManage() {
                 })
             }
         } catch (error) {
-            console.log("Error in catch ", error);
             const wrapper3 = document.createElement('div');
             wrapper3.innerHTML = `An unknown error occurred. Question by <span style="font-weight: 500;">${userName}</span> didn't <span style="font-weight: 500;">${action}ed</span>!`;
             swal({
@@ -193,7 +187,6 @@ export default function ReportedQuestionManage() {
 
     useEffect(() => {
         if (reportedQuestionReasons.length > 0) {
-            console.log('modal is going to open ');
             openDialog();
         }
     }, [reportedQuestionReasons]);
@@ -256,11 +249,9 @@ export default function ReportedQuestionManage() {
                     <button
                         className={`bg-black hover:bg-gray-900 text-white  w-24 py-2 rounded-lg`}
                         onClick={async () => {
-                            console.log('clicked View button: ', props.row.original.author.userName, props.getValue());
                             const author = props.row.original.author.userName;
                             const id = props.getValue();
                             const details = { id, author };
-                            console.log('details', details);
                             handleViewReasons(details)
                         }}>
                         <div className="flex items-center justify-center gap-3">View<span><Open /></span></div>
@@ -297,10 +288,7 @@ export default function ReportedQuestionManage() {
             accessorKey: "status",
             cell: (props) => (
                 <button
-                    className={`${props.getValue() === 'pending' ? 'bg-[#ffae00] hover:bg-[#ff9e0c] text-black' : (props.getValue() === 'blocked' ? 'bg-red-800 hover:bg-red-900 text-white' : 'bg-green-800 hover:bg-green-900 text-white')} capitalize w-[124px] py-2 rounded-lg`}
-                    onClick={() => {
-                        console.log('clicked status: ', props.getValue());
-                    }}>
+                    className={`${props.getValue() === 'pending' ? 'bg-[#ffae00] hover:bg-[#ff9e0c] text-black' : (props.getValue() === 'blocked' ? 'bg-red-800 hover:bg-red-900 text-white' : 'bg-green-800 hover:bg-green-900 text-white')} capitalize w-[124px] py-2 rounded-lg`}>
                     <div className="flex items-center justify-center gap-3">{props.getValue()}<span>{props.getValue() == 'pending' ? <Pending /> : (props.getValue() == 'blocked' ? <Block /> : <FactCheck />)}</span></div>
                 </button>
             ),
@@ -313,7 +301,6 @@ export default function ReportedQuestionManage() {
                 <button
                     className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-28 py-2 rounded-lg`}
                     onClick={() => {
-                        console.log('clicked actions: ', props.row.original.question._id);
                         handleQuestionAction(props.row.original.question._id, props.row.original.author.userName, props.getValue().toLowerCase())
                     }}>
                     <div className="flex items-center justify-evenly">{props.getValue()}<span>{props.getValue() == 'Block' ? <PublicOff /> : <Public />}</span></div>

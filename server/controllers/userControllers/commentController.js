@@ -35,7 +35,6 @@ const addComment = async (req, res) => {
 
 const commentsDataGet = async (req, res) => {
     try {
-        console.log('req.query.page', req.query.page);
         const { page, questionId } = req.query;
         const perPage = 4;
         const skipCount = perPage * page;
@@ -135,7 +134,6 @@ const editComment = async (req, res) => {
         }
         data.comment = inputData;
         const saved = await data.save();
-        console.log(saved, 'saved');
         return res.status(200).json({ message: 'Comment edited successfully' });
     } catch (err) {
         console.log(err.message);

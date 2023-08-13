@@ -20,10 +20,6 @@ export default function Comment(props) {
     const [validInputData, setValidInputData] = useState(true);
 
     useEffect(() => {
-        console.log("We are at Comment component");
-    }, [])
-
-    useEffect(() => {
         setInputData(comment.comment);
     }, [comment]);
 
@@ -73,7 +69,6 @@ export default function Comment(props) {
     };
 
     const handleEditButton = () => {
-        console.log('clicked. iseditiong: ', isEditing);
         setIsEditing(!isEditing)
     }
 
@@ -120,7 +115,6 @@ export default function Comment(props) {
     }
 
     const handleSubmitButton = async () => {
-        console.log('clicked submit');
         setLoading(true);
         // Make a put request to submit edited values
         try {
@@ -136,7 +130,6 @@ export default function Comment(props) {
                 },
                 withCredentials: true,
             });
-            console.log(res.data);
         } catch (err) {
             console.log(err.message);
         }
@@ -189,7 +182,6 @@ export default function Comment(props) {
                         onUpdate();
                     });
                 } catch (err) {
-                    console.log(err.message);
                     onUpdate();
                     Swal.fire(
                         'Error!',

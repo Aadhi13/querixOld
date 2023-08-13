@@ -40,7 +40,6 @@ export default function ReportedCommentManage() {
                 },
                 withCredentials: true,
             }).then((res) => {
-                console.log('res', res.data);
                 setReportedComments(res.data.reportedCommentsData);
             });
         } catch (err) {
@@ -57,16 +56,12 @@ export default function ReportedCommentManage() {
         }
     }, []);
 
-    useEffect(() => {
-        console.log('Reported comments ', reportedComments);
-    }, [reportedComments])
 
     const data = useMemo(() => reportedComments, [reportedComments]);
 
 
     //blocking & unblocking reported comments 
     const handleCommentAction = async (commentId, userName, action) => {
-        console.log('questionId => ', commentId, '\nuserName => ', userName, '\naction => ', action);
         try {
             const token = localStorage.getItem("admin");
             if (!token) {
@@ -127,7 +122,6 @@ export default function ReportedCommentManage() {
                 })
             }
         } catch (error) {
-            console.log("Error in catch ", error);
             const wrapper3 = document.createElement('div');
             wrapper3.innerHTML = `An unknown error occurred. Comment by <span style="font-weight: 500;">${userName}</span> didn't <span style="font-weight: 500;">${action}ed</span>!`;
             swal({
@@ -194,7 +188,6 @@ export default function ReportedCommentManage() {
 
     useEffect(() => {
         if (reportedCommentReasons.length > 0) {
-            console.log('modal is going to open ');
             openDialog();
         }
     }, [reportedCommentReasons]);
@@ -241,11 +234,9 @@ export default function ReportedCommentManage() {
                     <button
                         className={`bg-black hover:bg-gray-900 text-white  w-24 py-2 rounded-lg`}
                         onClick={async () => {
-                            console.log('clicked View button: ', props.row.original.author.userName, props.getValue());
                             const author = props.row.original.author.userName;
                             const id = props.getValue();
                             const details = { id, author };
-                            console.log('details', details);
                             handleViewReasons(details)
                         }}>
                         <div className="flex items-center justify-center gap-3">View<span><Open /></span></div>
@@ -282,10 +273,7 @@ export default function ReportedCommentManage() {
             accessorKey: "status",
             cell: (props) => (
                 <button
-                    className={`${props.getValue() === 'pending' ? 'bg-[#ffae00] hover:bg-[#ff9e0c] text-black' : (props.getValue() === 'blocked' ? 'bg-red-800 hover:bg-red-900 text-white' : 'bg-green-800 hover:bg-green-900 text-white')} capitalize w-[124px] py-2 rounded-lg`}
-                    onClick={() => {
-                        console.log('clicked status: ', props.getValue());
-                    }}>
+                    className={`${props.getValue() === 'pending' ? 'bg-[#ffae00] hover:bg-[#ff9e0c] text-black' : (props.getValue() === 'blocked' ? 'bg-red-800 hover:bg-red-900 text-white' : 'bg-green-800 hover:bg-green-900 text-white')} capitalize w-[124px] py-2 rounded-lg`}>
                     <div className="flex items-center justify-center gap-3">{props.getValue()}<span>{props.getValue() == 'pending' ? <Pending /> : (props.getValue() == 'blocked' ? <Block /> : <FactCheck />)}</span></div>
                 </button>
             ),
@@ -298,7 +286,6 @@ export default function ReportedCommentManage() {
                 <button
                     className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-28 py-2 rounded-lg`}
                     onClick={() => {
-                        console.log('clicked actions: ', props.row.original.comment._id);
                         handleCommentAction(props.row.original.comment._id, props.row.original.author.userName, props.getValue().toLowerCase())
                     }}>
                     <div className="flex items-center justify-evenly">{props.getValue()}<span>{props.getValue() == 'Block' ? <PublicOff /> : <Public />}</span></div>

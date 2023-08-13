@@ -13,11 +13,6 @@ export default function SavedAnswer(props) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log("We are at Saved Answer component");
-    }, [])
-
-
-    useEffect(() => {
         if (userData?.savedAnswers?.includes(savedAnswer?._id)) {
             setSave(true)
         }
@@ -119,7 +114,6 @@ export default function SavedAnswer(props) {
             vote = -1;
         } else {
             vote = 0;
-            console.log('Its neutral', vote);
         }
 
         const token = localStorage.getItem('user');
@@ -244,7 +238,7 @@ export default function SavedAnswer(props) {
                         </div>
                     </div>
                 </div>
-                <div className='flex flex-col w-full mr-12 my-3 w-full'>
+                <div className='flex flex-col w-full mr-12 my-3'>
                     <div className='mt-[1px]'>
                         <div className='flex items-center ml-1 text-base font-medium'>{savedAnswer?.author?.name}</div>
                         <div className='flex items-center ml-1 text-sm'>{savedAnswer?.author?.userName}</div>

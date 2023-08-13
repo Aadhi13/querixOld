@@ -20,10 +20,6 @@ export default function Answer(props) {
     const [validInputData, setValidInputData] = useState(true);
 
     useEffect(() => {
-        console.log("We are at Answer component");
-    }, [])
-
-    useEffect(() => {
         setInputData(answer.answer);
     }, [answer]);
 
@@ -73,7 +69,6 @@ export default function Answer(props) {
     };
 
     const handleEditButton = () => {
-        console.log('clicked. iseditiong: ', isEditing);
         setIsEditing(!isEditing)
     }
 
@@ -120,7 +115,6 @@ export default function Answer(props) {
     }
 
     const handleSubmitButton = async () => {
-        console.log('clicked submit');
         setLoading(true);
         // Make a put request to submit edited values
         try {
@@ -136,7 +130,6 @@ export default function Answer(props) {
                 },
                 withCredentials: true,
             });
-            console.log(res.data);
         } catch (err) {
             console.log(err.message);
         }

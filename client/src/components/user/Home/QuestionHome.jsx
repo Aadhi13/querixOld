@@ -26,10 +26,6 @@ const QuestionHome = forwardRef(function QuestionHome(props, ref) {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log(question);
-    }, [])
-
-    useEffect(() => {
         if (question.votes.upVote.userId.includes(userData._id)) {
             setVote(1);
         } else if (question.votes.downVote.userId.includes(userData._id)) {
@@ -336,7 +332,6 @@ const QuestionHome = forwardRef(function QuestionHome(props, ref) {
     };
 
     const handleReportSubmit = async () => {
-        console.log('Report =>', question);
         try {
             setLoading(true);
             const token = localStorage.getItem('user');

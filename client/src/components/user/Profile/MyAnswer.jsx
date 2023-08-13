@@ -36,10 +36,6 @@ export default function MyAnswer() {
         fetchData();
     }, [update])
 
-    useEffect(() => {
-        console.log("We are at MyAnswer component");
-    }, [])
-
     return (
         <div className=''>
             <div className='text-2xl capitalize font-semibold pb-5'>My Answers</div>

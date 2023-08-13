@@ -34,7 +34,6 @@ const addAnswer = async (req, res) => {
 
 const answersDataGet = async (req, res) => {
     try {
-        console.log('req.query.page', req.query.page);
         const { page, questionId } = req.query;
         const perPage = 4;
         const skipCount = perPage * page;
@@ -102,7 +101,6 @@ const answerVote = async (req, res) => {
         const userId = req.userId;
         const { voteIs, answerId } = req.body;
         const answer = await answerData.findById({ _id: new ObjectId(answerId) })
-        console.log('answer', answer);
         if (voteIs == 'upVote') {
             if (answer.votes.upVote.userId.includes(userId)) { //upVoted answer >> upVote
                 return res.status(304).json({ message: 'Already upVoted.' })
@@ -168,11 +166,8 @@ const reportAnswer = async (req, res) => {
         if (!answerDetails) {
             return res.status(401).json({ message: 'Invalid answer.' });
         } else {
-            console.log('1');
             const reportedAnswerDetails = await reportedAnswerData.findOne({ answer: answerId });
-            console.log('2');
             if (reportedAnswerDetails) {
-                console.log('3');
                 const isUserReported = reportedAnswerDetails.reportedBy.some((reportedBy) => reportedBy.userId.toString() === userId.toString());
                 if (isUserReported) {
                     return res.status(409).json({ message: 'Answer is already reported by this user.' });
@@ -233,7 +228,6 @@ const editAnswer = async (req, res) => {
         }
         data.answer = inputData;
         const saved = await data.save();
-        console.log(saved, 'saved');
         return res.status(200).json({ message: 'Answer edited successfully' });
     } catch (err) {
         console.log(err.message);

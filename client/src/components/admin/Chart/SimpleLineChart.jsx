@@ -52,7 +52,6 @@ export default function SimpleLineChart(props) {
         if (!token) {
           dispatch(getAdminData());
         } else {
-          console.log(token, 'toekn');
           const res = (await axios.get("/admin/statistics-data", {
             params: { days },
             headers: {

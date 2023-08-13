@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react'
 import SimpleLineChart from './SimpleLineChart';
 
 export default function Activity() {
-    const [days, setDays] = useState(10);
 
-    useEffect(() => {
-        console.log("We are at Activity component");
-    }, [])
+    const [days, setDays] = useState(10);
 
     return (
         <div className=''>

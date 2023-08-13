@@ -25,9 +25,6 @@ const editProfile = async (req, res) => {
     try {
         const userId = req.userId;
         const { name, userName } = req.body.inputData;
-        console.log('name: ', name);
-        console.log('userName: ', userName);
-        console.log('userId: ', userId);
         const data = await userData.findById(userId, { name: 1, userName: 1, email: 1 });
         if (!data) {
             return res.status(404).json({ message: 'User not found' });

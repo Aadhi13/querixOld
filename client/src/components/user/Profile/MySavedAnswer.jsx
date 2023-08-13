@@ -37,11 +37,7 @@ export default function MySavedAnswer() {
         fetchData();
     }, [update])
 
-    useEffect(() => {
-        console.log("We are at My Saved Answer component");
-    }, [])
-
-
+    
     return (
         <div className=''>
             <div className='text-2xl capitalize font-semibold pb-5'>Saved Answers</div>

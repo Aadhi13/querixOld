@@ -53,16 +53,12 @@ function QuestionManage() {
     }
   }, []);
 
-  useEffect(() => {
-    console.log('questions ', questions);
-  }, [questions])
 
   const data = useMemo(() => questions, [questions]);
 
 
   //blocking & unblocking questions
   const handleQuestionAction = async (questionId, userName, action) => {
-    console.log('questionId => ', questionId, '\nuserName => ', userName, '\naction => ', action);
     try {
       const token = localStorage.getItem("admin");
       if (!token) {
@@ -123,7 +119,6 @@ function QuestionManage() {
         })
       }
     } catch (error) {
-      console.log("Error in catch ", error);
       const wrapper3 = document.createElement('div');
       wrapper3.innerHTML = `An unknown error occurred. Question by <span style="font-weight: 500;">${userName}</span> didn't <span style="font-weight: 500;">${action}ed</span>!`;
       swal({
@@ -199,7 +194,6 @@ function QuestionManage() {
         <button
           className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-28 py-2 rounded-lg`}
           onClick={() => {
-            console.log('clicked', props.row.original._id);
             handleQuestionAction(props.row.original._id, props.row.original.author.userName, props.getValue().toLowerCase())
           }}>
           <div className="flex items-center justify-evenly">{props.getValue()}<span>{props.getValue() == 'Block' ? <PublicOff /> : <Public />}</span></div>

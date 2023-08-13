@@ -36,11 +36,7 @@ export default function MyComments() {
         };
         fetchData();
     }, [update])
-
-    useEffect(() => {
-        console.log("We are at MyComment component");
-    }, [])
-
+    
     return (
         <div className=''>
             <div className='text-2xl capitalize font-semibold pb-5'>My Comments</div>

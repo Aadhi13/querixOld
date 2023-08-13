@@ -53,7 +53,6 @@ export default function UserManage() {
 
     //blocking & unblocking users 
     const handleUserAction = async (userId, userName, action) => {
-        console.log('userId => ', userId, '\nuserName => ', userName, '\naction => ', action);
         try {
             const token = localStorage.getItem("admin");
             if (!token) {
@@ -114,7 +113,6 @@ export default function UserManage() {
                 })
             }
         } catch (error) {
-            console.log("Error in catch ", error);
             const wrapper3 = document.createElement('div');
             wrapper3.innerHTML = `An unknown error occurred. User <span style="font-weight: 500;">${userName}</span> didn't <span style="font-weight: 500;">${action}ed</span>!`;
             swal({
@@ -158,7 +156,6 @@ export default function UserManage() {
                 <button
                     className={`${props.getValue() == 'Unblock' ? 'bg-green-800 hover:bg-green-900' : 'bg-red-800 hover:bg-red-900'} text-white  w-28 py-2 rounded-lg`}
                     onClick={() => {
-                        console.log('clicked', props.row.original._id);
                         handleUserAction(props.row.original._id, props.row.original.userName, props.getValue().toLowerCase())
                     }}>
                     <div className="flex items-center justify-evenly">{props.getValue()}<span>{props.getValue() == 'Block' ? <PublicOff /> : <Public />}</span></div>
@@ -167,77 +164,6 @@ export default function UserManage() {
         },
     ];
 
-
-    /*
-    
-    //blocking users 
-    const userBlock = async (id) => {
-        try {
-            swal({
-                title: "Are you sure?",
-                text: "are you sure you want to block this user?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-                .then((userBlock) => {
-                    if (userBlock) {
-                        axios.put("/admin/block-user/" + id).then((res) => {
-                            axios.get("/admin/user-details").then((redds) => {
-                                dispatch(setCompleteUsersDetails(redds.data));
-                            });
-                        })
-                        swal("user blocked !", {
-                            icon: "success",
-                        });
-                    } else {
-                        swal("Canceled blockin");
-                    }
-                });
-    
-            axios.defaults.baseURL = import.meta.env.VITE_APP_BACKEND_URL;
-    
-            ;
-        } catch (error) {
-            console.log("error in catch ", error);
-        }
-    };
-    
-    //unblocking user 
-    const userUnBlock = async (id) => {
-        try {
-            swal({
-                title: "Are you sure?",
-                text: "are you sure you want to unblock this user?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-                .then((userUnblock) => {
-                    if (userUnblock) {
-                        axios.defaults.baseURL = import.meta.env.VITE_APP_BACKEND_URL;
-                        axios.put("/admin/unblock-user/" + id).then((res) => {
-                            toast.success("User unblocked");
-                            axios.get("/admin/user-details").then((response) => {
-                                dispatch(setCompleteUsersDetails(response.data));
-                            });
-                        })
-                        swal("user Unblockedblocked !", {
-                            icon: "success",
-                        });
-                    } else {
-                        swal("Canceled unblocking user");
-                    }
-                });
-            ;
-        } catch (error) {
-            console.log("error from admin side ", error);
-        }
-    };
-    
-    const { completeUsers } = useSelector((state) => state.users);
-    
-    */
 
     useEffect(() => {
         const sr = scrollreveal({

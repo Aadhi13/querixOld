@@ -72,7 +72,6 @@ const reportedCommentsDataGet = async (req, res) => {
 const reportedCommentReasonsDataGet = async (req, res) => {
     try {
         const reportedCommentId = req.query.reportedCommentId;
-        console.log('repo comment id', reportedCommentId);
         const reportedCommentDetails = await reportedCommentData.aggregate([
             { $match: { _id: new mongoose.Types.ObjectId(reportedCommentId) } },
             { $unwind: "$reportedBy" },
@@ -92,7 +91,6 @@ const reportedCommentReasonsDataGet = async (req, res) => {
                 }
             }
         ]);
-        console.log('repoCommentdetails', reportedCommentDetails);
 
         if (!reportedCommentDetails || reportedCommentDetails.length === 0) {
             return res.status(404).json({ message: "Invalid reported comment." });
@@ -110,7 +108,6 @@ const commentBlock = async (req, res) => {
     try {
         const commentId = req.params.commentId;
         //Logic for managing reportedComment status 
-        console.log('comment Id', commentId);
         const reportedCommentDetails = await reportedCommentData.find({ comment: commentId });
         if (reportedCommentDetails[0]?.status != 'blocked') {
             await reportedCommentData.findOneAndUpdate({ comment: commentId }, { $set: { status: 'blocked' } });

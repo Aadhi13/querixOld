@@ -371,7 +371,6 @@ const Answer = forwardRef(function Answer(props, ref) {
     //Handle reporting answers
 
     const handleReportSubmit = async () => {
-        console.log('Report =>', answer);
         try {
             setLoading(true);
             const token = localStorage.getItem('user');

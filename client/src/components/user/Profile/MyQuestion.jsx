@@ -14,9 +14,6 @@ export default function MyQuestion() {
         setUpdate(!update);
     }
 
-    useEffect(() => {
-        console.log("We are at MyQuestion component");
-    }, [])
 
     useEffect(() => {
         const fetchData = async () => {

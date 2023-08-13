@@ -69,7 +69,6 @@ function Signin() {
                 navigate("/");
             }
         } catch (err) {
-            console.log(err.response.data.message == "Access Denied: Your account has been suspended.");
             if (err.message == "No jwt token.") {
                 setErrMsg("Something went wrong.");
             } else if (err.message == "Something went wrong.") {

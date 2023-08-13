@@ -142,7 +142,6 @@ const Comment = forwardRef(function Comment(props, ref) {
     };
 
     const handleReportSubmit = async () => {
-        console.log('Report =>', comment);
         try {
             setLoading(true);
             const token = localStorage.getItem('user');
@@ -190,7 +189,6 @@ const Comment = forwardRef(function Comment(props, ref) {
 
             setLoading(false);
         } catch (err) {
-            console.log('err=>', err, '\n', 'err.reseponse=>', err.response);
             if (err === 'no token') {
                 console.log(err, 'err');
                 setInput('');

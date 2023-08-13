@@ -30,7 +30,6 @@ const addQuestion = async (req, res) => {
 
 const questionsDataGet = async (req, res) => {
     try {
-        console.log('req.query.page', req.query.page);
         const { page } = req.query;
 
         const blockedQuestionCount = await questionData.countDocuments({ blockStatus: true });
@@ -56,7 +55,6 @@ const questionsDataGet = async (req, res) => {
 
 const questionDataGet = async (req, res) => {
     try {
-        console.log('req.params.questionId', req.params.questionId)
         const questionId = req.params.questionId
         try {
             const singleQuestionData = await questionData.findById({ _id: new ObjectId(questionId) }).populate('userId', 'userName name')
@@ -82,7 +80,6 @@ const questionVote = async (req, res) => {
         const userId = req.userId;
         const { voteIs, questionId } = req.body;
         const question = await questionData.findById({ _id: new ObjectId(questionId) })
-        console.log('\n\nVote =\n', req.body);
         if (voteIs == 'upVote') {
             if (question.votes.upVote.userId.includes(userId)) { //upVoted question >> upVote
                 return res.status(304).json({ message: 'Already upVoted.' })
@@ -225,7 +222,6 @@ const editQuestion = async (req, res) => {
         data.question = question;
         data.tags = tags;
         const saved = await data.save();
-        console.log(saved, 'saved');
         return res.status(200).json({ message: 'Question edited successfully' });
     } catch (err) {
         console.log(err.message);
@@ -237,29 +233,23 @@ const delteQuestion = async (req, res) => {
     try {
         const userId = req.userId;
         const { questionId } = req.body;
-        console.log(questionId, '<<<>>>', userId);
         questionData.findOne({ _id: questionId })
             .then((question) => {
                 if (!question) {
-                    console.log('Document not found');
                     return res.status(404).json({ message: 'Requested question not found.', status: 'Not found.' });
                 }
                 if (!question.userId.equals(userId)) {
-                    console.log('Unauthorized: User ID does not match.');
                     return res.status(401).json({ message: 'Unauthorized: You do not have access to edit this question.', status: 'Unauthorized' });
                 }
                 questionData.deleteOne({ _id: questionId })
                     .then(() => {
-                        console.log('Document deleted successfully');
                         return res.status(200).json({ message: 'Document deleted successfully.', status: 'Success.' });
                     })
                     .catch((error) => {
-                        console.error('Error deleting document:', error);
                         return res.status(500).json({ message: "Internal server error.", status: 'Failed.' })
                     });
             })
             .catch((error) => {
-                console.error('Error finding document:', error);
                 return res.status(404).json({ message: 'Requested question not found.', status: 'Not found.' });
             });
 
