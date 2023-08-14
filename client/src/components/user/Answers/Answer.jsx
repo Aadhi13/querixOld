@@ -483,7 +483,7 @@ const Answer = forwardRef(function Answer(props, ref) {
         <>
 
             <ToastContainer />
-            <div ref={ref} key={answer._id} >
+            <div ref={ref} key={answer._id}>
                 <div className='flex flex-row border-gray-400 border rounded-lg mb-4 bg-sky-50' id={answer._id} ref={answerRef}>
                     <div className='p-2'>
                         <div className='flex justify-center items-center rounded-full bg-profileBtBg w-12 h-12 overflow-hidden'>

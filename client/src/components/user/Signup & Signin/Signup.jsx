@@ -155,7 +155,7 @@ function Signup() {
       <div className='items-center justify-center flex' style={{ height: '86vh' }}>
         <div className="">
           <div className="rounded-lg shadow-sm shadow-gray-500 bg-gray-200 bg-opacity-90 w-90 h-auto">
-            <div style={{ width: "362px" }} className="px-10 sm:p-6">
+            <div style={{ width: "362px" }} className="sm:px-8 px-5 py-8">
               <h1 className="text-3xl select-none font-semibold  font-roboto ">
                 Sign up
               </h1>

@@ -670,9 +670,10 @@ function Question() {
     return (
         <>
             <ToastContainer />
-            <div className='mx-72 mt-5'>
 
-                <div className='flex flex-row border-gray-300 border mx-56 rounded-lg mb-4'>
+            <div className='2xl:mx-96 xl:mx-52 ml:mx-28 mx-5 mt-5 xs:mx-14'>
+
+                <div className='flex flex-row border-gray-300 border 2xl:mx-20 xl:mx-40 lg:mx-32 md:mx-16 rounded-lg mb-4'>
                     <div className='p-2'>
                         <div className='flex justify-center items-center rounded-full bg-profileBtBg w-12 h-12 overflow-hidden'>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-profileBt w-11 h-11 mt-4">
@@ -700,9 +701,9 @@ function Question() {
                             <div className='font-semibold text-xl my-3'>{question?.question?.title}</div>
                             <div className='pr-1.5 mb-3'><pre className='whitespace-pre-wrap font-sans'>{question?.question?.body}</pre></div>
                         </div>
-                        <div className='flex justify-start items-center mb-3'>
+                        <div className='flex sm:flex-row flex-col justify-start items-center mb-3 text-xs md:text-sm lg:text-base'>
                             {question.tags && question.tags.map((tag, index) => (
-                                <div key={index} className='mr-2 bg-sky-100 py-0.5 px-1.5 rounded-md text-sm text-sky-700' >{tag}</div>
+                                <div key={index} className='mr-2 bg-sky-100 py-0.5 px-1.5 rounded-md text-sm text-sky-700 my-2 sm:my-0' >{tag}</div>
                             ))}
                         </div>
                         <div className='flex justify-start '>
@@ -712,7 +713,7 @@ function Question() {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                     </svg>
                                 </div>
-                                <button className='ml-1 text-sm font-medium'>{question?.answers?.length + newAnswerCount} Answers</button>
+                                <button className='ml-1 sm:block hidden text-sm font-medium'>{question?.answers?.length + newAnswerCount} Answers</button>
                             </div>
                             <div className={`mr-2 flex justify-center items-center ${isAnswer ? 'bg-none' : 'bg-gray-300'} hover:bg-gray-300 rounded-md p-1.5 cursor-pointer`} onClick={() => setIsAnswer(false)}>
                                 <div>
@@ -720,7 +721,7 @@ function Question() {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                                     </svg>
                                 </div>
-                                <button className='ml-1 text-sm font-medium'>{question?.comments?.length + newCommentCount} Comments</button>
+                                <button className='ml-1 sm:block hidden text-sm font-medium'>{question?.comments?.length + newCommentCount} Comments</button>
                             </div>
                             {save ?
                                 <div className='mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5 cursor-pointer text-green-700' onClick={handleUnsaveQuestion}>
@@ -728,21 +729,21 @@ function Question() {
                                         <path fillRule="evenodd" d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 01-1.085.67L12 18.089l-7.165 3.583A.75.75 0 013.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93z" clipRule="evenodd" />
                                     </svg>
 
-                                    <button className='ml-1 text-sm font-medium '>Saved</button>
+                                    <button className='ml-1 sm:block hidden text-sm font-medium '>Saved</button>
                                 </div>
                                 :
                                 <div className='mr-2 flex justify-center items-center hover:bg-gray-300 hover:rounded-md p-1.5 cursor-pointer' onClick={handleSaveQuestion}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
                                     </svg>
-                                    <button className='ml-1 text-sm font-medium '>Save</button>
+                                    <button className='ml-1 sm:block hidden text-sm font-medium '>Save</button>
                                 </div>
                             }
                             <div className='mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5 cursor-pointer' onClick={handleShareQuestion}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 256 256">
                                     <path fill="currentColor" d="m237.66 106.35l-80-80A8 8 0 0 0 144 32v40.35c-25.94 2.22-54.59 14.92-78.16 34.91c-28.38 24.08-46.05 55.11-49.76 87.37a12 12 0 0 0 20.68 9.58c11-11.71 50.14-48.74 107.24-52V192a8 8 0 0 0 13.66 5.65l80-80a8 8 0 0 0 0-11.3ZM160 172.69V144a8 8 0 0 0-8-8c-28.08 0-55.43 7.33-81.29 21.8a196.17 196.17 0 0 0-36.57 26.52c5.8-23.84 20.42-46.51 42.05-64.86C99.41 99.77 127.75 88 152 88a8 8 0 0 0 8-8V51.32L220.69 112Z"></path>
                                 </svg>
-                                <button className='ml-1 text-sm font-medium '>Share</button>
+                                <button className='ml-1 sm:block hidden text-sm font-medium '>Share</button>
                             </div>
                             <div ref={triggerRef} className='relative mr-2 flex justify-center items-center hover:bg-gray-300 rounded-md p-1.5 cursor-pointer' onClick={openDialog}>
                                 <div>
@@ -805,8 +806,8 @@ function Question() {
                     <>
                         {/* Answers & Comments */}
                         <div className=''>
-                            <h1 className='mx-60 text-3xl font-bold mb-4'>Answers</h1>
-                            <div className='mx-56'>
+                            <h1 className='2xl:mx-20 xl:mx-40 lg:mx-32 md:mx-16 text-3xl pl-4 font-bold mb-4'>Answers</h1>
+                            <div className='2xl:mx-20 xl:mx-40 lg:mx-32 md:mx-16'>
 
                                 {/* Here we are gonna display the input box for answering based on user is logged in or not. */}
                                 {userData ?
@@ -837,8 +838,8 @@ function Question() {
                     <>
                         {/* Comments */}
                         <div className=''>
-                            <h1 className='mx-60 text-3xl font-bold mb-4'>Comments</h1>
-                            <div className='mx-56'>
+                            <h1 className='2xl:mx-20 xl:mx-40 lg:mx-32 md:mx-16 text-3xl pl-4 font-bold mb-4'>Comments</h1>
+                            <div className='2xl:mx-20 xl:mx-40 lg:mx-32 md:mx-16'>
 
                                 {/* Here we are going to display the input box for commenting based on the user is logged in or not. */}
                                 {userData ?

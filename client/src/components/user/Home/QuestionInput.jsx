@@ -180,7 +180,7 @@ export default function QuestionInput(props) {
     return (
         <>
             <ToastContainer />
-            <div className='flex flex-row border-gray-400 border mx-56 rounded-lg mb-4'>
+            <div className='flex flex-row border-gray-400 border lg:mx-44 md:mx-14 rounded-lg mb-4'>
                 <PlaceholderUser />
                 <div className='flex flex-col pb-3 w-full'>
                     <div className='mt-2'>

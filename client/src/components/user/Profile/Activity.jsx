@@ -6,7 +6,7 @@ export default function Activity() {
     const [days, setDays] = useState(10);
 
     return (
-        <div className=''>
+        <div>
             <div className='text-2xl capitalize font-semibold pb-5'>My Activity</div>
             <div className='flex flex-row justify-between rounded-3xl'>                 {/* Activity */}
                 <div className="flex justify-center items-center">

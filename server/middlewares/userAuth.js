@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const userData = require("../models/user/userModel");
 
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
     try {
         const token = req.header('Authorization');
         if (!token) return res.status(401).json({ message: 'No jwt token.' })
@@ -10,6 +11,8 @@ const auth = (req, res, next) => {
             return res.status(401).json({ message: 'Jwt expired.' });
         }
         const userId = decode.id;
+        const data = await userData.findById(userId);
+        if (data.blockStatus) return res.status(401).json({ message: 'Jwt expired.' });
         req.userId = userId
         next()
     } catch (err) {

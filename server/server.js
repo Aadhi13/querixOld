@@ -4,7 +4,10 @@ const morgan = require('morgan');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
-const PORT = 7000;
+const PORT = process.env.PORT;
+const dbUrl = process.env.DATABASE;
+const allowedOrigin = process.env.ORIGIN;
+
 
 //routes
 const userRoutes = require('./routes/userRoutes.js');
@@ -13,14 +16,23 @@ const adminRoutes = require('./routes/adminRoutes.js');
 //middlewares
 app.use(morgan('dev'))
 app.use(express.json());
+
 app.use(cors({
-    origin: 'http://localhost:5173', // allow requests from this origin
-    credentials: true, // allow credentials to be sent with the request
+  origin: allowedOrigin,
+  credentials: true,
 }));
 
 //database connection
-mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://127.0.0.1:27017/querix");
+mongoose.connect(dbUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch(error => {
+        console.error('Error connecting to MongoDB:', error);
+    });
 
 //routing
 app.use('/', userRoutes);

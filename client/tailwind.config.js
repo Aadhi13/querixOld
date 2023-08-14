@@ -33,6 +33,7 @@ export default {
       'ml': '1081px',
       'xl': '1280px',
       '2xl': '1536px',
+      '3xl': '2000px',
     }
   },
   plugins: [],

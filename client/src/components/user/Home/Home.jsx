@@ -80,7 +80,7 @@ export default function Home() {
 
 
     return (
-        <div className='mx-72 mt-5'>
+        <div className='2xl:mx-80 xl:mx-52 ml:mx-28 mt-5 xs:mx-14'>
 
             <QuestionInput onUpdate={triggerFetchData} />
 
