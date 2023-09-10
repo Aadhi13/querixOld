@@ -23,7 +23,7 @@ app.use(cors({
 }));
 
 //database connection
-mongoose.connect(dbUrl, {
+mongoose.connect(`${dbUrl}/querix`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
