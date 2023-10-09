@@ -6,7 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from '../../../api/axios';
 
 const NAME_REGEX = /^\S.{0,}\S$/
-const USERNAME_REGEX = /^[a-zA-z][a-zA-Z0-9-_]{4,23}$/;
+// const USERNAME_REGEX = /^[a-zA-z][a-zA-Z0-9-_]{4,23}$/;
+const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{4,23}$/;
 
 export default function Profile() {
     const navigate = useNavigate();

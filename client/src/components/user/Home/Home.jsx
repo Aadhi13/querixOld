@@ -78,9 +78,12 @@ export default function Home() {
         reFetchData();
     };
 
+    //Debug responsive 
+    // border-red-500 xs:border-blue-500 sm:border-green-500 md:border-orange-500 
+    // lg:border-violet-500 ml:border-yellow-500 xl:border-pink-500 2xl:border-cyan-500 3xl:border-rose-500
 
     return (
-        <div className='2xl:mx-80 xl:mx-52 ml:mx-28 mt-5 xs:mx-14'>
+        <div className='border mx-2 xs:mx-4 sm:mx-8 md:mx-16 lg:mx-28 ml:mx-44 xl:mx-52 2xl:mx-[24rem] 3xl:mx-[28rem]'>
 
             <QuestionInput onUpdate={triggerFetchData} />
 

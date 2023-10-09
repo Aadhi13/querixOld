@@ -20,7 +20,7 @@ export default function IsAuthenticated({ children }) {
             }
         } else {
             // admin is not logged in 
-            if (location.pathname.startsWith('/admin/') && location.pathname !== '/admin/signin') {
+            if (location.pathname.startsWith('/admin') && location.pathname !== '/admin/signin') {
                 navigate('/admin/signin');
             }
         }

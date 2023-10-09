@@ -444,7 +444,7 @@ const QuestionHome = forwardRef(function QuestionHome(props, ref) {
         <div>
             <ToastContainer />
 
-            <div ref={ref} key={question._id} className='flex flex-row border-gray-300 border lg:mx-44 md:mx-14 rounded-lg mb-4' >
+            <div ref={ref} key={question._id} className='flex flex-row border-gray-300 border rounded-lg mb-4' >
                 <div className='p-2'>
                     <div className='flex justify-center items-center rounded-full bg-profileBtBg w-12 h-12 overflow-hidden'>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-profileBt w-11 h-11 mt-4">
@@ -474,6 +474,7 @@ const QuestionHome = forwardRef(function QuestionHome(props, ref) {
                             <pre className='whitespace-pre-wrap font-sans'>{question?.question.body}</pre>
                         </div>
                     </div>
+                    {/* Tags */}
                     <div className='flex justify-start items-center mb-3'>
                         {question.tags && question.tags.map((tag, index) => (
                             <div key={index} className='mr-2 bg-sky-100 py-0.5 px-1.5 rounded-md text-sm text-sky-700' >{tag}</div>

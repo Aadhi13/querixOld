@@ -14,10 +14,10 @@ export default function Navbar() {
         </div>
         {/* sm:w-[3px] md:w-[14rem] lg:w-[17rem] ml:w-[14rem] xl:w-[20rem] */}
         {/* <div className="search mt-8 sm:mt-0 w-[8rem] ml:w-[14rem] lg:w-[17rem] xl:w-[20rem]"> */}
-        <div className="flex items-center flex-row search mt-8 sm:mt-0 sm:w-auto w-[240px]">
+        {/* <div className="flex items-center flex-row search mt-8 sm:mt-0 sm:w-auto w-[240px]">
           <BiSearch className="text-2xl flex-shrink-0 " />
           <input type="text" placeholder="Search" className="text-[#ffc107] sm:hidden md:block md:w-[7rem] lg:w-[10rem] ml:w-[12rem] xl:w-[14rem]" />
-        </div>
+        </div> */}
       </div>
     </Nav>
   );

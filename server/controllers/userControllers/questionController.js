@@ -48,7 +48,7 @@ const questionsDataGet = async (req, res) => {
             questionsCount: totalQuestionCount - blockedQuestionCount,
         });
     } catch (err) {
-        console.log(err.message);
+        console.log('Error questionsDataGet: ', err);
     }
 };
 
